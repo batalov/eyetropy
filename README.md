@@ -78,6 +78,282 @@ screen/noise, unwanted artifacts or other unexpected things.
                     },
                     'info');
 ```
+Output example:
+```
+{
+  "classificationResults": [
+    {
+      "frame": "1",
+      "classifiedObjects": [
+        {
+          "className": "lampshade, lamp shade",
+          "probability": 0.39289921522140503
+        },
+        {
+          "className": "coil, spiral, volute, whorl, helix",
+          "probability": 0.07808805257081985
+        },
+        {
+          "className": "basketball",
+          "probability": 0.07187622785568237
+        }
+      ]
+    },
+    {
+      "frame": "2",
+      "classifiedObjects": [
+        {
+          "className": "chain",
+          "probability": 0.10306758433580399
+        },
+        {
+          "className": "knot",
+          "probability": 0.09443259239196777
+        },
+        {
+          "className": "dial telephone, dial phone",
+          "probability": 0.09123830497264862
+        }
+      ]
+    },
+    {
+      "frame": "3",
+      "classifiedObjects": [
+        {
+          "className": "bolo tie, bolo, bola tie, bola",
+          "probability": 0.13482630252838135
+        },
+        {
+          "className": "chime, bell, gong",
+          "probability": 0.11956140398979187
+        },
+        {
+          "className": "pitcher, ewer",
+          "probability": 0.08103001117706299
+        }
+      ]
+    },
+    {
+      "frame": "4",
+      "classifiedObjects": [
+        {
+          "className": "coil, spiral, volute, whorl, helix",
+          "probability": 0.42891454696655273
+        },
+        {
+          "className": "bannister, banister, balustrade, balusters, handrail",
+          "probability": 0.09382343292236328
+        },
+        {
+          "className": "chime, bell, gong",
+          "probability": 0.07599473744630814
+        }
+      ]
+    },
+    {
+      "frame": "5",
+      "classifiedObjects": [
+        {
+          "className": "plate rack",
+          "probability": 0.24081091582775116
+        },
+        {
+          "className": "racket, racquet",
+          "probability": 0.11407682299613953
+        },
+        {
+          "className": "dial telephone, dial phone",
+          "probability": 0.03518284857273102
+        }
+      ]
+    }
+  ],
+  "metaData": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "mpeg4",
+        "codec_long_name": "MPEG-4 part 2",
+        "profile": "Simple Profile",
+        "codec_type": "video",
+        "codec_time_base": "1001/24000",
+        "codec_tag_string": "mp4v",
+        "codec_tag": "0x7634706d",
+        "width": 1280,
+        "height": 720,
+        "coded_width": 1280,
+        "coded_height": 720,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv420p",
+        "level": 1,
+        "color_range": "unknown",
+        "color_space": "unknown",
+        "color_transfer": "unknown",
+        "color_primaries": "unknown",
+        "chroma_location": "left",
+        "field_order": "unknown",
+        "timecode": "N/A",
+        "refs": 1,
+        "quarter_sample": "false",
+        "divx_packed": "false",
+        "id": "N/A",
+        "r_frame_rate": "24000/1001",
+        "avg_frame_rate": "24000/1001",
+        "time_base": "1/24000",
+        "start_pts": 0,
+        "start_time": 0,
+        "duration_ts": 233233,
+        "duration": 9.718042,
+        "bit_rate": 1128420,
+        "max_bit_rate": 1128420,
+        "bits_per_raw_sample": "N/A",
+        "nb_frames": 233,
+        "nb_read_frames": "N/A",
+        "nb_read_packets": "N/A",
+        "tags": {
+          "language": "und",
+          "handler_name": "Core Media Video"
+        },
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0
+        }
+      }
+    ],
+    "format": {
+      "filename": "/somefile/file.mp4",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "start_time": 0,
+      "duration": 9.719,
+      "size": 1372668,
+      "bit_rate": 1129884,
+      "probe_score": 100,
+      "tags": {
+        "major_brand": "isom",
+        "minor_version": "512",
+        "compatible_brands": "isomiso2mp41",
+        "encoder": "Lavf58.20.100"
+      }
+    },
+    "chapters": []
+  },
+  "vmafMotionAvg": 12.892,
+  "blackPeriods": null,
+  "freezePeriods": null,
+  "silentPeriods": null,
+  "bitplaneNoise": {
+    "average": {
+      "avgBitplaneNoise_O_1": 0.1552558,
+      "avgBitplaneNoise_1_1": 0.14800319999999997,
+      "avgBitplaneNoise_2_1": 0.11773940000000001
+    },
+    "output": [
+      {
+        "second": 0,
+        "bitplaneNoise_O_1": 0.424067,
+        "bitplaneNoise_1_1": 0.312656,
+        "bitplaneNoise_2_1": 0.221675
+      },
+      {
+        "second": 1,
+        "bitplaneNoise_O_1": 0.072244,
+        "bitplaneNoise_1_1": 0.103958,
+        "bitplaneNoise_2_1": 0.08842
+      },
+      {
+        "second": 2,
+        "bitplaneNoise_O_1": 0.077771,
+        "bitplaneNoise_1_1": 0.100503,
+        "bitplaneNoise_2_1": 0.090972
+      },
+      {
+        "second": 3,
+        "bitplaneNoise_O_1": 0.101869,
+        "bitplaneNoise_1_1": 0.122404,
+        "bitplaneNoise_2_1": 0.106623
+      },
+      {
+        "second": 4,
+        "bitplaneNoise_O_1": 0.100328,
+        "bitplaneNoise_1_1": 0.100495,
+        "bitplaneNoise_2_1": 0.081007
+      }
+    ]
+  },
+  "entropy": {
+    "average": {
+      "avgEntropyNormal_Y": 5.430507,
+      "avgNormalizedEntropy_Y": 0.6788131999999999,
+      "avgEntropyNormal_U": 3.7568126,
+      "avgNormalizedEntropy_U": 0.4696016,
+      "avgEntropyNormal_V": 3.4184449999999997,
+      "avgNormalizedEntropy_V": 0.42730560000000006
+    },
+    "output": [
+      {
+        "second": 0,
+        "entropyNormal_Y": 6.471491,
+        "normalizedEntropy_Y": 0.808936,
+        "entropyNormal_U": 4.402239,
+        "normalizedEntropy_U": 0.55028,
+        "entropyNormal_V": 3.889918,
+        "normalizedEntropy_V": 0.48624
+      },
+      {
+        "second": 1,
+        "entropyNormal_Y": 4.725867,
+        "normalizedEntropy_Y": 0.590733,
+        "entropyNormal_U": 3.321663,
+        "normalizedEntropy_U": 0.415208,
+        "entropyNormal_V": 2.960512,
+        "normalizedEntropy_V": 0.370064
+      },
+      {
+        "second": 2,
+        "entropyNormal_Y": 5.102835,
+        "normalizedEntropy_Y": 0.637854,
+        "entropyNormal_U": 3.443807,
+        "normalizedEntropy_U": 0.430476,
+        "entropyNormal_V": 3.377833,
+        "normalizedEntropy_V": 0.422229
+      },
+      {
+        "second": 3,
+        "entropyNormal_Y": 5.265728,
+        "normalizedEntropy_Y": 0.658216,
+        "entropyNormal_U": 3.539674,
+        "normalizedEntropy_U": 0.442459,
+        "entropyNormal_V": 3.223495,
+        "normalizedEntropy_V": 0.402937
+      },
+      {
+        "second": 4,
+        "entropyNormal_Y": 5.586614,
+        "normalizedEntropy_Y": 0.698327,
+        "entropyNormal_U": 4.07668,
+        "normalizedEntropy_U": 0.509585,
+        "entropyNormal_V": 3.640467,
+        "normalizedEntropy_V": 0.455058
+      }
+    ]
+  }
+}
+```
 
 ## General Notes
 * Bare in mind that increasing values of frame rate and time length properties also increase 
