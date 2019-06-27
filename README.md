@@ -31,10 +31,10 @@ screen/noise, unwanted artifacts or other unexpected things.
     const {eyetropy} = require('eyetropy');
     
     // get meta data for input source of rtsp stream
-    eyetropy.analyze('rtsp://your-value/');
+    eyetropy('rtsp://your-value/');
     
     //get meta data and VMAF Motion Average for input source of a .mp4 file
-    eyetropy.analyze('/Users/yourUser/Documents/test.mp4', {vmafMotionAvg: true, metaData: true});
+    eyetropy('/Users/yourUser/Documents/test.mp4', {vmafMotionAvg: true, metaData: true});
     
     /* get meta data, VMAF Motion Average, detect black/freeze/silent periods,
      * measure bitplane noise/entropy, classify objects for input source of a m3u playlist
@@ -42,7 +42,7 @@ screen/noise, unwanted artifacts or other unexpected things.
      * pass config object, setting time length in seconds and frame rate (frame per second)
      * for the video segmenting
      */
-    eyetropy.analyze('https://coolcam.probably/hls/camera12_2.m3u8',
+    eyetropy('https://coolcam.probably/hls/camera12_2.m3u8',
                     {vmafMotionAvg: true, 
                      metaData: true,
                      detectBlackness: true,
