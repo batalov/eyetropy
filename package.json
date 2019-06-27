@@ -1,0 +1,26 @@
+{
+  "name": "eyetropy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "testing",
+    "video",
+    "analytics"
+  ],
+  "author": "Alexey Batalov",
+  "license": "MIT",
+  "dependencies": {
+    "@tensorflow-models/mobilenet": "^1.0.1",
+    "@tensorflow/tfjs": "^1.1.2",
+    "@tensorflow/tfjs-node": "^1.1.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "joi": "^14.3.1",
+    "loglevel": "^1.6.3",
+    "rollup": "^1.12.4",
+    "sharp": "^0.22.1"
+  }
+}
