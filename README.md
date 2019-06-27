@@ -116,57 +116,6 @@ Output example:
         }
       ]
     },
-    {
-      "frame": "3",
-      "classifiedObjects": [
-        {
-          "className": "bolo tie, bolo, bola tie, bola",
-          "probability": 0.13482630252838135
-        },
-        {
-          "className": "chime, bell, gong",
-          "probability": 0.11956140398979187
-        },
-        {
-          "className": "pitcher, ewer",
-          "probability": 0.08103001117706299
-        }
-      ]
-    },
-    {
-      "frame": "4",
-      "classifiedObjects": [
-        {
-          "className": "coil, spiral, volute, whorl, helix",
-          "probability": 0.42891454696655273
-        },
-        {
-          "className": "bannister, banister, balustrade, balusters, handrail",
-          "probability": 0.09382343292236328
-        },
-        {
-          "className": "chime, bell, gong",
-          "probability": 0.07599473744630814
-        }
-      ]
-    },
-    {
-      "frame": "5",
-      "classifiedObjects": [
-        {
-          "className": "plate rack",
-          "probability": 0.24081091582775116
-        },
-        {
-          "className": "racket, racquet",
-          "probability": 0.11407682299613953
-        },
-        {
-          "className": "dial telephone, dial phone",
-          "probability": 0.03518284857273102
-        }
-      ]
-    }
   ],
   "metaData": {
     "streams": [
@@ -274,24 +223,7 @@ Output example:
         "bitplaneNoise_O_1": 0.072244,
         "bitplaneNoise_1_1": 0.103958,
         "bitplaneNoise_2_1": 0.08842
-      },
-      {
-        "second": 2,
-        "bitplaneNoise_O_1": 0.077771,
-        "bitplaneNoise_1_1": 0.100503,
-        "bitplaneNoise_2_1": 0.090972
-      },
-      {
-        "second": 3,
-        "bitplaneNoise_O_1": 0.101869,
-        "bitplaneNoise_1_1": 0.122404,
-        "bitplaneNoise_2_1": 0.106623
-      },
-      {
-        "second": 4,
-        "bitplaneNoise_O_1": 0.100328,
-        "bitplaneNoise_1_1": 0.100495,
-        "bitplaneNoise_2_1": 0.081007
+      }
       }
     ]
   },
@@ -316,33 +248,6 @@ Output example:
       },
       {
         "second": 1,
-        "entropyNormal_Y": 4.725867,
-        "normalizedEntropy_Y": 0.590733,
-        "entropyNormal_U": 3.321663,
-        "normalizedEntropy_U": 0.415208,
-        "entropyNormal_V": 2.960512,
-        "normalizedEntropy_V": 0.370064
-      },
-      {
-        "second": 2,
-        "entropyNormal_Y": 5.102835,
-        "normalizedEntropy_Y": 0.637854,
-        "entropyNormal_U": 3.443807,
-        "normalizedEntropy_U": 0.430476,
-        "entropyNormal_V": 3.377833,
-        "normalizedEntropy_V": 0.422229
-      },
-      {
-        "second": 3,
-        "entropyNormal_Y": 5.265728,
-        "normalizedEntropy_Y": 0.658216,
-        "entropyNormal_U": 3.539674,
-        "normalizedEntropy_U": 0.442459,
-        "entropyNormal_V": 3.223495,
-        "normalizedEntropy_V": 0.402937
-      },
-      {
-        "second": 4,
         "entropyNormal_Y": 5.586614,
         "normalizedEntropy_Y": 0.698327,
         "entropyNormal_U": 4.07668,
