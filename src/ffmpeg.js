@@ -14,7 +14,7 @@ module.exports.getMetaData = async (input) => {
         log.debug(`[meta-data]: output \n ${output}`);
         return output
     } catch (e) {
-        e.message = `Error collecting metadata from ${input}\n${e.message}`;
+        e.message = `[meta-data]: error collecting metadata\n${e.message}`;
         throw e
     }
 };
@@ -31,7 +31,7 @@ module.exports.getVmafMotionAvg = async (input, timeLength) => {
         log.debug(`[VMAF]: value ${vmafMotionAvg}`);
         return vmafMotionAvg
     } catch (e) {
-        e.message = `Error evaluating VMAF Motion Average from ${input}\n${e.message}`;
+        e.message = `[VMAF]: error evaluating VMAF Motion Average\n${e.message}`;
         throw e
     }
 };
@@ -64,7 +64,7 @@ module.exports.detectBlack = async (input, timeLength) => {
         log.debug(`[black-detect]: output result\n${fragments}`);
         return fragments
     } catch (e) {
-        e.message = `Error detecting black periods from ${input}\n${e.message}`;
+        e.message = `[black-detect]: error detecting black periods\n${e.message}`;
         throw e
     }
 };
@@ -98,7 +98,7 @@ module.exports.detectFreeze = async (input, timeLength) => {
         log.debug(`[freeze-detect]: output result\n${fragments}`);
         return fragments
     } catch (e) {
-        e.message = `Error detecting freeze periods from ${input}\n${e.message}`;
+        e.message = `[freeze-detect]: error detecting freeze periods\n${e.message}`;
         throw e
     }
 };
@@ -132,7 +132,7 @@ module.exports.detectSilence = async (input, timeLength) => {
         log.debug(`[silence-detect]: output result\n${fragments}`);
         return fragments
     } catch (e) {
-        e.message = `Error detecting silent periods from ${input}\n${e.message}`;
+        e.message = `[silence-detect]: error detecting silent periods\n${e.message}`;
         throw e
     }
 };
@@ -178,7 +178,7 @@ module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
         log.debug(`[bitplane-noise]: output value is\n${{average, output}}`);
         return {average, output}
     } catch (e) {
-        e.message = `Error measuring bitplane noise from ${input}\n${e.message}`;
+        e.message = `[bitplane-noise]: error measuring bitplane noise\n${e.message}`;
         throw e
     }
 };
@@ -233,7 +233,7 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
         log.debug(`[entropy]: output value is\n${{average, output}}`);
         return {average, output}
     } catch (e) {
-        e.message = `Error measuring entropy from ${input}\n${e.message}`;
+        e.message = `[entropy]: error measuring entropy\n${e.message}`;
         throw e
     }
 };
@@ -241,10 +241,10 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
 module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength) => {
     try {
         const timeArg = formatTimeArg(timeLength);
-        log.info(`Splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`);
+        log.info(`[split-image]: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`);
         await execute(`ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ./tmp/thumb%04d.jpg`, maxBuffer);
     } catch (e) {
-        e.message = `Error splitting video into images from ${input}\n${e.message}`;
+        e.message = `[split-image]: error splitting video into images\n${e.message}`;
         throw e
     }
 };

@@ -22,7 +22,7 @@ async function readImage(path) {
         log.debug(`[tensor-flow]: image pixels info\n${JSON.stringify(info)}`);
         return result
     } catch (e) {
-        e.message = `Error reading image ${path}\n${e.message}`;
+        e.message = `[tensor-flow]: error reading image\n${e.message}`;
         throw e;
     }
 }
@@ -35,7 +35,7 @@ function imageToInput(image, numChannels) {
         log.debug(`[tensor-flow]: tensorflow object is\n${JSON.stringify(result)}`);
         return result
     } catch (e) {
-        e.message = `Error transforming image into tensorflow 3d object\n${e.message}`;
+        e.message = `[tensor-flow]: error transforming image into tensorflow 3d object\n${e.message}`;
         throw e
     }
 }
@@ -55,7 +55,7 @@ async function classify(path) {
             classifiedObjects: predictions
         }
     } catch (e) {
-        e.message = `Error classifying image ${path}\n${e.message}`;
+        e.message = `[tensor-flow]: error classifying image\n${e.message}`;
         throw e
     }
 }
@@ -80,7 +80,7 @@ module.exports.getClassifiedObjectsForImages = async (path) => {
 
         return classificationResults;
     } catch (e) {
-        e.message = `Error evaluating multiple image object classification ${path}\n${e.message}`;
+        e.message = `[tensor-flow]: error evaluating multiple image object classification\n${e.message}`;
         throw e
     }
 };

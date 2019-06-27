@@ -122,15 +122,15 @@ async function classify(input, config) {
 
 async function cleanUp(dir) {
     try {
-        log.info(`Start cleanup for ${dir} `);
+        log.info(`[cleanup]: start cleanup for ${dir} `);
         const files = await readdir(dir);
 
         files.forEach(async (file) => {
             await unlink(path.join(dir, file))
         });
-        log.info('Finish cleanup process\n');
+        log.info('[cleanup]: finish cleanup process\n');
     } catch (e) {
-        e.message = `Error cleaning up directory ${input}\n${e.message}`;
+        e.message = `[cleanup]: error cleaning up directory\n${e.message}`;
         throw e
     }
 }
