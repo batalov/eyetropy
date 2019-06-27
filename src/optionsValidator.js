@@ -2,7 +2,7 @@ const joi = require('joi');
 const log = require('loglevel');
 
 async function validateOptions(options) {
-    log.info('Validate options');
+    log.info('[options-validator]: validate options');
     const schema = joi.object().keys({
         metaData: joi.boolean().valid(true),
         vmafMotionAvg: joi.boolean().valid(true),
@@ -16,9 +16,9 @@ async function validateOptions(options) {
 
     try {
         await joi.validate(options, schema, { abortEarly: false });
-        log.info('Successfully validated options');
+        log.info('[options-validator]: successfully validated options');
     } catch (e) {
-        e.message = `Options parameters validation failure: ${e.message}`;
+        e.message = `[options-validator]: options parameters validation failure: ${e.message}`;
         throw e
     }
 }
