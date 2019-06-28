@@ -3,7 +3,7 @@ const path = require('path');
 const {promisify} = require('util');
 const readdir = promisify(fs.readdir);
 const unlink = promisify(fs.unlink);
-const {cfg} = require('./config');
+const {cfg} = require('./config/config');
 const validateConfig = require('./src/configValidator');
 const validateOptions = require('./src/optionsValidator');
 const tf = require('./src/tensorFlow');
@@ -22,19 +22,12 @@ const {
 
 const eyetropy = async function (input, options, config, logLevel) {
     try {
-        if (typeof logLevel === 'string' && logLevel.match(/trace|debug|info|warn|error/gm)) {
-            log.setLevel(logLevel);
-        } else {
-            log.setLevel('info');
-        }
-
+        setLogLevel(logLevel);
         await validateOptions(options);
         await validateConfig(config);
         const conf = await prepareConfig(config);
 
-        await cleanUp(conf.tempDir);
         const results = await launch(input, options, conf);
-        await cleanUp(conf.tempDir);
 
         return results
     } catch (e) {
@@ -45,7 +38,7 @@ const eyetropy = async function (input, options, config, logLevel) {
 
 async function launch(input, options, config) {
     // if options empty or not passed return metadata
-    if (options == null || Object.entries(options).length === 0 && options.constructor === Object) {
+    if (options == null || options.constructor === Object && Object.entries(options).length === 0) {
         return {metaData: await getMetaData(input)}
     }
 
@@ -54,9 +47,9 @@ async function launch(input, options, config) {
         0: 'classificationResults',
         1: 'metaData',
         2: 'vmafMotionAvg',
-        3: 'blackPeriods',
-        4: 'freezePeriods',
-        5: 'silentPeriods',
+        3: 'blackParts',
+        4: 'freezeParts',
+        5: 'silentParts',
         6: 'bitplaneNoise',
         7: 'entropy'
     };
@@ -81,8 +74,8 @@ async function launch(input, options, config) {
         methods[4] = detectFreeze(input, config.detectFreezes.timeLength);
     }
 
-    if (options.detectSilentPeriods) {
-        methods[5] = detectSilence(input, config.detectSilentPeriods.timeLength);
+    if (options.detectSilentParts) {
+        methods[5] = detectSilence(input, config.detectSilentParts.timeLength);
     }
 
     if (options.measureBitplaneNoise) {
@@ -107,7 +100,7 @@ async function launch(input, options, config) {
 
 async function prepareConfig(config) {
     const output = cfg;
-    if (config && Object.entries(config).length > 0 && config.constructor === Object) {
+    if (config && config.constructor === Object && Object.entries(config).length > 0) {
         for (const key in config) {
             if (config.hasOwnProperty(key)) output[key] = config[key];
         }
@@ -116,22 +109,49 @@ async function prepareConfig(config) {
 }
 
 async function classify(input, config) {
+    await checkDir(config.tempDir);
+    await cleanUp(config.tempDir);
     await splitVideoIntoJpgImages(input, config.splitImages.frameRate, config.splitImages.timeLength);
-    return await tf.getClassifiedObjectsForImages(config.tempDir);
+    const results = await tf.getClassifiedObjectsForImages(config.tempDir);
+    await cleanUp(config.tempDir);
+    return results
+}
+
+async function checkDir(dir, config) {
+    try {
+        log.info(`${cfg.logLabel.checkDir}: start checking directory for existence`);
+        if (fs.existsSync(dir)) {
+            log.info(`${cfg.logLabel.checkDir}: directory ${dir} exists`);
+        } else {
+            log.info(`${cfg.logLabel.checkDir}: directory ${dir} does not exist, making dir /tmp`);
+            fs.mkdirSync(config.tempDir);
+        }
+    } catch (e) {
+        e.message = `${cfg.logLabel.checkDir}: error making directory \n${e.message}`;
+        throw e
+    }
 }
 
 async function cleanUp(dir) {
     try {
-        log.info(`[cleanup]: start cleanup for ${dir} `);
+        log.info(`${cfg.logLabel.cleanUp}: start cleanup for ${dir}`);
         const files = await readdir(dir);
 
         files.forEach(async (file) => {
             await unlink(path.join(dir, file))
         });
-        log.info('[cleanup]: finish cleanup process\n');
+        log.info(`${cfg.logLabel.cleanUp}: finish cleanup process\n`);
     } catch (e) {
-        e.message = `[cleanup]: error cleaning up directory\n${e.message}`;
+        e.message = `${cfg.logLabel.cleanUp}: error cleaning up directory\n${e.message}`;
         throw e
+    }
+}
+
+function setLogLevel(logLevel) {
+    if (typeof logLevel === 'string' && logLevel.match(/trace|debug|info|warn|error/gm)) {
+        log.setLevel(logLevel);
+    } else {
+        log.setLevel('info');
     }
 }
 

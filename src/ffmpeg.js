@@ -4,135 +4,155 @@ const {exec} = require('child_process');
 const execute = promisify(exec);
 const maxBuffer = {maxBuffer: 1024 * 10000};
 const log = require('loglevel');
+const {cfg} = require('../config/config');
 
 module.exports.getMetaData = async (input) => {
     try {
-        log.info('[meta-data]: start collecting meta data');
+        log.info(`${cfg.logLabel.metaData}: start collecting meta data`);
         const ffprobe = promisify(ffmpeg.ffprobe);
         const output = await ffprobe(input);
-        log.info('[meta-data]: finish collecting meta data \n');
-        log.debug(`[meta-data]: output \n ${output}`);
+        log.info(`${cfg.logLabel.metaData}: finish collecting meta data \n`);
+        log.debug(`${cfg.logLabel.metaData}: output \n ${output}`);
         return output
     } catch (e) {
-        e.message = `[meta-data]: error collecting metadata\n${e.message}`;
+        e.message = `${cfg.logLabel.metaData}: error collecting metadata\n${e.message}`;
         throw e
     }
 };
 
 module.exports.getVmafMotionAvg = async (input, timeLength) => {
     try {
-        log.info('[VMAF]: start evaluating VMAF Motion Average');
+        log.info(`${cfg.logLabel.vmaf}: start evaluating VMAF Motion Average`);
         const timeArg = formatTimeArg(timeLength);
         const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -i ${input} -vf vmafmotion -f null -`, maxBuffer);
         const vmafMotionAvg = Number(stderr.match(/(?<=VMAF Motion avg: ).*/gm)[0]);
-        log.info('[VMAF]: finish evaluating VMAF Motion Average');
-        log.debug(`[VMAF]: stdout output \n ${stdout}`);
-        log.debug(`[VMAF]: stderr output \n ${stderr}`);
-        log.debug(`[VMAF]: value ${vmafMotionAvg}`);
+        log.info(`${cfg.logLabel.vmaf}: finish evaluating VMAF Motion Average`);
+        log.debug(`${cfg.logLabel.vmaf}: stdout output \n ${stdout}`);
+        log.debug(`${cfg.logLabel.vmaf}: stderr output \n ${stderr}`);
+        log.debug(`${cfg.logLabel.vmaf}: value ${vmafMotionAvg}`);
         return vmafMotionAvg
     } catch (e) {
-        e.message = `[VMAF]: error evaluating VMAF Motion Average\n${e.message}`;
+        e.message = `${cfg.logLabel.vmaf}: error evaluating VMAF Motion Average\n${e.message}`;
         throw e
     }
 };
 
 module.exports.detectBlack = async (input, timeLength) => {
     try {
-        log.info('[black-detect]: start detecting black periods');
+        log.info(`${cfg.logLabel.blackDetect}: start detecting black parts`);
         const timeArg = formatTimeArg(timeLength);
         const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -nostats -i ${input} -vf blackdetect -f null -`, maxBuffer);
-        const fragments = stderr.match(/black_start[:|\d|\.\s|black_end|black_duration]*/gm);
-        log.debug(`[black-detect]: stdout \n ${stdout}`);
-        log.debug(`[black-detect]: stderr \n ${stderr}`);
-        log.debug(`[black-detect]: regular expression value\n${fragments}`);
+        log.debug(`${cfg.logLabel.blackDetect}: stdout \n ${stdout}`);
+        log.debug(`${cfg.logLabel.blackDetect}: stderr \n ${stderr}`);
 
-        if (fragments !== null) {
-            return fragments.map((fragment) => {
-                return {
-                    blackStart: Number(fragment.match(/(?<=black_start:)[\d\.]*/gm)),
-                    blackEnd: Number(fragment.match(/(?<=black_end:)[\d\.]*/gm)),
-                    blackDuration: Number(fragment.match(/(?<=black_duration:)[\d\.]*/gm))
-                }
-            });
+        const collectedBlackParts = stderr.match(/black_start:[\s\d.]*|black_end:[\s\d.]*|black_duration:[\s\d.]*/gm);
+        log.debug(`${cfg.logLabel.blackDetect}: split regular expression value\n${collectedBlackParts}`);
+
+        if (collectedBlackParts !== null) {
+            const pattern = /black_(start|end|duration):[\s\.\d]*,black_(start|end|duration):[\s\.\d]*,black_(start|end|duration):[\s\.\d]*/gm;
+            const splitBlackParts = collectedBlackParts.join(',').match(pattern);
+            log.debug(`${cfg.logLabel.blackDetect}: group split regular expression value\n${splitBlackParts}`);
+
+            if (splitBlackParts !== null) {
+                return splitBlackParts.map((fragment) => {
+                    return {
+                        blackStart: Number(fragment.match(/(?<=black_start:)[\s\d\.]*/gm)),
+                        blackEnd: Number(fragment.match(/(?<=black_end:)[\s\d\.]*/gm)),
+                        blackDuration: Number(fragment.match(/(?<=black_duration:)[\s\d\.]*/gm))
+                    }
+                });
+            }
         }
 
-        // in case of any parsing problem output the whole stderr
-        if (fragments === null && stderr.match(/blackdetect/gm)) {
-            return stderr
+        // in case of any parsing problem
+        if (collectedBlackParts === null && stderr.match(/blackdetect/gm)) {
+            return stderr.match(/blackdetect.*/gm);
         }
-        log.info('[black-detect]: finish detecting black periods');
-        log.debug(`[black-detect]: output result\n${fragments}`);
-        return fragments
+        log.info(`${cfg.logLabel.blackDetect}: finish detecting black parts`);
+        log.debug(`${cfg.logLabel.blackDetect}: output result\n${collectedBlackParts}`);
+        return collectedBlackParts
     } catch (e) {
-        e.message = `[black-detect]: error detecting black periods\n${e.message}`;
+        e.message = `${cfg.logLabel.blackDetect}: error detecting black parts\n${e.message}`;
         throw e
     }
 };
 
 module.exports.detectFreeze = async (input, timeLength) => {
     try {
-        log.info('[freeze-detect]: start detecting freeze periods');
+        log.info(`${cfg.logLabel.freezeDetect}: start detecting freeze parts`);
         const timeArg = formatTimeArg(timeLength);
         const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -nostats -i ${input} -vf freezedetect -f null -`, maxBuffer);
-        const pattern = /freeze_start:\s[\d\.]*\n\[freezedetect @ [\dxabcdef]*]\slavfi.freezedetect.freeze_duration:\s[\d\.]*\n\[freezedetect @ [\dxabcdef]*]\slavfi.freezedetect.freeze_end:\s[\d\.]*/gm;
-        const fragments = stderr.match(pattern);
-        log.debug(`[freeze-detect]: stdout \n ${stdout}`);
-        log.debug(`[freeze-detect]: stderr \n ${stderr}`);
-        log.debug(`[freeze-detect]: regular expression value\n${fragments}`);
+        log.debug(`${cfg.logLabel.freezeDetect}: stdout \n ${stdout}`);
+        log.debug(`${cfg.logLabel.freezeDetect}: stderr \n ${stderr}`);
 
-        if (fragments !== null) {
-            return fragments.map((fragment) => {
-                return {
-                    freezeStart: Number(fragment.match(/(?<=freeze_start:\s)[\d\.]*/gm)),
-                    freezeEnd: Number(fragment.match(/(?<=freeze_end:\s)[\d\.]*/gm)),
-                    freezeDuration: Number(fragment.match(/(?<=freeze_duration:\s)[\d\.]*/gm))
-                }
-            });
+        const collectedFreezeParts = stderr.match(/freeze_start:[\s\d.]*|freeze_end:[\s\d.]*|freeze_duration:[\s\d.]*/gm);
+        log.debug(`${cfg.logLabel.freezeDetect}: split regular expression value\n${collectedFreezeParts}`);
+
+        if (collectedFreezeParts !== null) {
+            const pattern = /freeze_(start|end|duration):[\s\.\d]*,freeze_(start|end|duration):[\s\.\d]*,freeze_(start|end|duration):[\s\.\d]*/gm;
+            const splitFreezeParts = collectedFreezeParts.join(',').match(pattern);
+            log.debug(`${cfg.logLabel.freezeDetect}: group split regular expression value\n${splitFreezeParts}`);
+
+            if (splitFreezeParts !== null) {
+                return splitFreezeParts.map((fragment) => {
+                    return {
+                        freezeStart: Number(fragment.match(/(?<=freeze_start:)[\s\d\.]*/gm)),
+                        freezeEnd: Number(fragment.match(/(?<=freeze_end:)[\s\d\.]*/gm)),
+                        freezeDuration: Number(fragment.match(/(?<=freeze_duration:)[\s\d\.]*/gm))
+                    }
+                });
+            }
         }
 
-        // in case of any parsing problem output the whole stderr
-        if (fragments === null && stderr.match(/freezedetect/gm)) {
-            return stderr
+        // in case of any parsing problem
+        if (collectedFreezeParts === null && stderr.match(/freezedetect/gm)) {
+            return stderr.match(/freezedetect.*/gm);
         }
-        log.info('[freeze-detect]: finish detecting freeze periods');
-        log.debug(`[freeze-detect]: output result\n${fragments}`);
-        return fragments
+        log.info(`${cfg.logLabel.freezeDetect}: finish detecting freeze parts`);
+        log.debug(`${cfg.logLabel.freezeDetect}: output result\n${collectedFreezeParts}`);
+        return collectedFreezeParts
     } catch (e) {
-        e.message = `[freeze-detect]: error detecting freeze periods\n${e.message}`;
+        e.message = `${cfg.logLabel.freezeDetect}: error detecting freeze parts\n${e.message}`;
         throw e
     }
 };
 
 module.exports.detectSilence = async (input, timeLength) => {
     try {
-        log.info('[silence-detect]: start detecting silent periods');
+        log.info(`${cfg.logLabel.silenceDetect}: start detecting silent parts`);
         const timeArg = formatTimeArg(timeLength);
         const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -nostats -i ${input} -af silencedetect -f null -`, maxBuffer);
-        const pattern = /silence_start:\s[\d\.]*\n\[silencedetect @ [\dxabcdef]*]\ssilence_end:\s[\d\.]*\s\|\ssilence_duration:\s[\d\.]*/gm;
-        const fragments = stderr.match(pattern);
-        log.debug(`[silence-detect]: stdout \n ${stdout}`);
-        log.debug(`[silence-detect]: stderr \n ${stderr}`);
-        log.debug(`[silence-detect]: regular expression value\n${fragments}`);
+        log.debug(`${cfg.logLabel.silenceDetect}: stdout \n ${stdout}`);
+        log.debug(`${cfg.logLabel.silenceDetect}: stderr \n ${stderr}`);
 
-        if (fragments !== null) {
-            return fragments.map((fragment) => {
-                return {
-                    silenceStart: Number(fragment.match(/(?<=silence_start:\s)[\d\.]*/gm)),
-                    silenceEnd: Number(fragment.match(/(?<=silence_end:\s)[\d\.]*/gm)),
-                    silenceDuration: Number(fragment.match(/(?<=silence_duration:\s)[\d\.]*/gm))
-                }
-            });
+        const collectedSilentParts = stderr.match(/silence_start:[\s\d.]*|silence_end:[\s\d.]*|silence_duration:[\s\d.]*/gm);
+        log.debug(`${cfg.logLabel.silenceDetect}: split regular expression value\n${collectedSilentParts}`);
+
+        if (collectedSilentParts !== null) {
+            const pattern = /silence_(start|end|duration):[\s\.\d]*,silence_(start|end|duration):[\s\.\d]*,silence_(start|end|duration):[\s\.\d]*/gm;
+            const splitSilentParts = collectedSilentParts.join(',').match(pattern);
+            log.debug(`${cfg.logLabel.silenceDetect}: group split regular expression value\n${splitSilentParts}`);
+
+            if (splitSilentParts !== null) {
+                return splitSilentParts.map((fragment) => {
+                    return {
+                        silenceStart: Number(fragment.match(/(?<=silence_start:)[\s\d\.]*/gm)),
+                        silenceEnd: Number(fragment.match(/(?<=silence_end:)[\s\d\.]*/gm)),
+                        silenceDuration: Number(fragment.match(/(?<=silence_duration:)[\s\d\.]*/gm))
+                    }
+                });
+            }
         }
 
-        // in case of any parsing problem output the whole stderr
-        if (fragments === null && stderr.match(/silencedetect/gm)) {
-            return stderr
+        // in case of any parsing problem
+        if (collectedSilentParts === null && stderr.match(/silencedetect/gm)) {
+            return stderr.match(/silencedetect.*/gm);
         }
-        log.info('[silence-detect]: finish detecting silent periods');
-        log.debug(`[silence-detect]: output result\n${fragments}`);
-        return fragments
+        log.info(`${cfg.logLabel.silenceDetect}: finish detecting silent parts`);
+        log.debug(`${cfg.logLabel.silenceDetect}: output result\n${collectedSilentParts}`);
+        return collectedSilentParts
     } catch (e) {
-        e.message = `[silence-detect]: error detecting silent periods\n${e.message}`;
+        e.message = `${cfg.logLabel.silenceDetect}: error detecting silent parts\n${e.message}`;
         throw e
     }
 };
@@ -141,13 +161,13 @@ module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
     try {
         const fR = frameRate ? `fps=${frameRate},` : '';
         const timeArg = formatTimeArg(timeLength);
-        log.info('[bitplane-noise]: start measuring bitplane noise');
+        log.info(`${cfg.logLabel.bitplaneNoise}: start measuring bitplane noise`);
         const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -i ${input} -vf ${fR}bitplanenoise,metadata=mode=print:file=- -f null -`, maxBuffer);
-        log.debug(`[bitplane-noise]: stdout\n ${stdout}`);
-        log.debug(`[bitplane-noise]: stderr\n ${stderr}`);
+        log.debug(`${cfg.logLabel.bitplaneNoise}: stdout\n ${stdout}`);
+        log.debug(`${cfg.logLabel.bitplaneNoise}: stderr\n ${stderr}`);
 
         const splitOutput = stdout.match(/.*\n.*\n.*\n.*\n/gm);
-        log.debug(`[bitplane-noise]: regular expression value\n ${splitOutput}`);
+        log.debug(`${cfg.logLabel.bitplaneNoise}: regular expression value\n ${splitOutput}`);
 
         const output = [];
         const average = {
@@ -174,11 +194,11 @@ module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
         for (const value in average) {
             average[value] = average[value] / output.length;
         }
-        log.info('[bitplane-noise]: finish measuring bitplane noise');
-        log.debug(`[bitplane-noise]: output value is\n${{average, output}}`);
+        log.info(`${cfg.logLabel.bitplaneNoise}: finish measuring bitplane noise`);
+        log.debug(`${cfg.logLabel.bitplaneNoise}: output value is\n${{average, output}}`);
         return {average, output}
     } catch (e) {
-        e.message = `[bitplane-noise]: error measuring bitplane noise\n${e.message}`;
+        e.message = `${cfg.logLabel.bitplaneNoise}: error measuring bitplane noise\n${e.message}`;
         throw e
     }
 };
@@ -187,13 +207,13 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
     try {
         const fR = frameRate ? `fps=${frameRate},` : '';
         const timeArg = formatTimeArg(timeLength);
-        log.info('[entropy]: start measuring entropy');
+        log.info(`${cfg.logLabel.entropy}: start measuring entropy`);
         const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -i ${input} -vf ${fR}entropy,metadata=mode=print:file=- -f null -`, maxBuffer);
-        log.debug(`[entropy]: stdout\n ${stdout}`);
-        log.debug(`[entropy]: stderr\n ${stderr}`);
+        log.debug(`${cfg.logLabel.entropy}: stdout\n ${stdout}`);
+        log.debug(`${cfg.logLabel.entropy}: stderr\n ${stderr}`);
 
         const splitOutput = stdout.match(/.*\n.*\n.*\n.*\n.*\n.*\n.*\n/gm);
-        log.debug(`[entropy]: regular expression value\n ${splitOutput}`);
+        log.debug(`${cfg.logLabel.entropy}: regular expression value\n ${splitOutput}`);
 
         const output = [];
         const average = {
@@ -229,11 +249,11 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
         for (const value in average) {
             average[value] = average[value] / output.length;
         }
-        log.info('[entropy]: finish measuring entropy');
-        log.debug(`[entropy]: output value is\n${{average, output}}`);
+        log.info('${cfg.logLabel.entropy}: finish measuring entropy');
+        log.debug(`${cfg.logLabel.entropy}: output value is\n${{average, output}}`);
         return {average, output}
     } catch (e) {
-        e.message = `[entropy]: error measuring entropy\n${e.message}`;
+        e.message = `${cfg.logLabel.entropy}: error measuring entropy\n${e.message}`;
         throw e
     }
 };
@@ -241,10 +261,10 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
 module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength) => {
     try {
         const timeArg = formatTimeArg(timeLength);
-        log.info(`[split-image]: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`);
+        log.info(`${cfg.logLabel.splitImage}: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`);
         await execute(`ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ./tmp/thumb%04d.jpg`, maxBuffer);
     } catch (e) {
-        e.message = `[split-image]: error splitting video into images\n${e.message}`;
+        e.message = `${cfg.logLabel.splitImage}: error splitting video into images\n${e.message}`;
         throw e
     }
 };

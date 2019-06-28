@@ -18,8 +18,8 @@ and the video quality as perceived by human**
 ## The Idea
 The whole concept of this package is to provide decent metrics (from simple meta data to more 
 complex metrics) for testing video files or streams. You can use the VMAF Motion Average 
-value to identify how much motion happens in the video as well as the perceived quality of it.
-Additionally you can detect silence, black/freeze periods on your input file/stream. Besides 
+value to identify how much motion happens on the video as well as the perceived quality of it.
+Additionally you can detect silence, black/freeze parts on your input file/stream. Besides 
 with entropy value you can get an amount of information on the input and with bitplane noise 
 measurement detect the bitplane noise. Combined with the machine learning algorithm, 
 which identifies objects on each video frame, you can have a nice combination of means to get a solid
