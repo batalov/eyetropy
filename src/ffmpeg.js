@@ -71,7 +71,7 @@ module.exports.detectBlack = async (input, timeLength) => {
         log.info(`${cfg.logLabel.blackDetect}: finish detecting black parts`);
         log.debug(`${cfg.logLabel.blackDetect}: output result\n${collectedBlackParts}`);
 
-        // return null if no parts were found
+        // returns null if no parts were found
         return collectedBlackParts
     } catch (e) {
         e.message = `${cfg.logLabel.blackDetect}: error detecting black parts\n${e.message}`;
@@ -113,7 +113,7 @@ module.exports.detectFreeze = async (input, timeLength) => {
         log.info(`${cfg.logLabel.freezeDetect}: finish detecting freeze parts`);
         log.debug(`${cfg.logLabel.freezeDetect}: output result\n${collectedFreezeParts}`);
 
-        // return null if no parts were found
+        // returns null if no parts were found
         return collectedFreezeParts
     } catch (e) {
         e.message = `${cfg.logLabel.freezeDetect}: error detecting freeze parts\n${e.message}`;
@@ -155,7 +155,7 @@ module.exports.detectSilence = async (input, timeLength) => {
         log.info(`${cfg.logLabel.silenceDetect}: finish detecting silent parts`);
         log.debug(`${cfg.logLabel.silenceDetect}: output result\n${collectedSilentParts}`);
 
-        // return null if no parts were found
+        // returns null if no parts were found
         return collectedSilentParts
     } catch (e) {
         e.message = `${cfg.logLabel.silenceDetect}: error detecting silent parts\n${e.message}`;
