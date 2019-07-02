@@ -12,6 +12,10 @@
     "video",
     "analytics"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git:///github.com/batalov/eyetropy"
+  },
   "author": "Alexey Batalov",
   "license": "MIT",
   "dependencies": {
