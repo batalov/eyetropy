@@ -15,6 +15,14 @@ and the video quality as perceived by human**
 ## Installation
 ```npm install eyetropy```
 
+## FFMPEG
+* Installation guides https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg
+
+* Direct download links:
+    https://ffmpeg.org/download.html
+    https://ffmpeg.zeranoe.com/builds/ 
+
+
 ## The Idea
 The whole concept of this package is to provide decent metrics (from simple meta data to more 
 complex metrics) for testing video files or streams. You can use the VMAF Motion Average 
@@ -353,3 +361,5 @@ https://medium.com/netflix-techblog/vmaf-the-journey-continues-44b51ee9ed12
 * TensorFlow js models: https://github.com/tensorflow/tfjs-models
 * Work on image integrity: https://pdfs.semanticscholar.org/f58b/216a76718854345b0f70637b14da6a1888cc.pdf?_ga=2.44905700.1550178958.1558516626-1913169076.1558516626
 * Grayscale entropy: https://stats.stackexchange.com/questions/235270/entropy-of-an-image
+* Fresh ffmpeg builds https://ffmpeg.zeranoe.com/builds/
+* ffmpeg installation instructions https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg
