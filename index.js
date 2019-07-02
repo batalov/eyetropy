@@ -117,14 +117,14 @@ async function classify(input, config) {
     return results
 }
 
-async function checkDir(dir, config) {
+async function checkDir(dir) {
     try {
         log.info(`${cfg.logLabel.checkDir}: start checking directory for existence`);
         if (fs.existsSync(dir)) {
             log.info(`${cfg.logLabel.checkDir}: directory ${dir} exists`);
         } else {
             log.info(`${cfg.logLabel.checkDir}: directory ${dir} does not exist, making dir /tmp`);
-            fs.mkdirSync(config.tempDir);
+            fs.mkdirSync(dir);
         }
     } catch (e) {
         e.message = `${cfg.logLabel.checkDir}: error making directory \n${e.message}`;
@@ -134,13 +134,14 @@ async function checkDir(dir, config) {
 
 async function cleanUp(dir) {
     try {
-        log.info(`${cfg.logLabel.cleanUp}: start cleanup for ${dir}`);
         const files = await readdir(dir);
-
-        files.forEach(async (file) => {
-            await unlink(path.join(dir, file))
-        });
-        log.info(`${cfg.logLabel.cleanUp}: finish cleanup process\n`);
+        if (files.length) {
+            log.info(`${cfg.logLabel.cleanUp}: start cleanup for ${dir}`);
+            files.forEach(async (file) => {
+                await unlink(path.join(dir, file))
+            });
+            log.info(`${cfg.logLabel.cleanUp}: finish cleanup process\n`);
+        }
     } catch (e) {
         e.message = `${cfg.logLabel.cleanUp}: error cleaning up directory\n${e.message}`;
         throw e
