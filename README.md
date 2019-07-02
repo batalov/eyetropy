@@ -259,6 +259,77 @@ Output example:
   }
 }
 ```
+Freeze/black/silent parts:
+```
+{
+  "blackParts": [
+    {
+      "blackStart": 10.4271,
+      "blackEnd": 14.4311,
+      "blackDuration": 4.004
+    },
+    {
+      "blackStart": 88.1297,
+      "blackEnd": 92.1337,
+      "blackDuration": 4.004
+    }
+  ],
+  "freezeParts": [
+    {
+      "freezeStart": 0,
+      "freezeEnd": 4.17083,
+      "freezeDuration": 4.17083
+    },
+    {
+      "freezeStart": 10.4271,
+      "freezeEnd": 14.4311,
+      "freezeDuration": 4.004
+    },
+    {
+      "freezeStart": 88.1297,
+      "freezeEnd": 92.1337,
+      "freezeDuration": 4.004
+    }
+  ],
+  "silentParts": [
+    {
+      "silenceStart": 0.0879792,
+      "silenceEnd": 5.69046,
+      "silenceDuration": 5.60248
+    },
+    {
+      "silenceStart": 10.4699,
+      "silenceEnd": 14.4782,
+      "silenceDuration": 4.00823
+    },
+    {
+      "silenceStart": 24.1095,
+      "silenceEnd": 28.1141,
+      "silenceDuration": 4.0046
+    },
+    {
+      "silenceStart": 47.7979,
+      "silenceEnd": 51.8054,
+      "silenceDuration": 4.00746
+    },
+    {
+      "silenceStart": 69.5935,
+      "silenceEnd": 75.8659,
+      "silenceDuration": 6.27233
+    },
+    {
+      "silenceStart": 88.1705,
+      "silenceEnd": 92.1828,
+      "silenceDuration": 4.01229
+    },
+    {
+      "silenceStart": 106.698,
+      "silenceEnd": 110.697,
+      "silenceDuration": 3.9989
+    }
+  ]
+}
+```
 
 ## General Notes
 * Bare in mind that increasing values of frame rate and time length properties also increase 
