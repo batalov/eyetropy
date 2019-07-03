@@ -68,7 +68,7 @@ screen/noise, unwanted artifacts or other unexpected things.
                      detectFreezes: {
                        timeLength: 7
                     },
-                     detectSilentPeriods: {
+                     detectSilentParts: {
                        timeLength: 7
                     },
                      entropy: {
