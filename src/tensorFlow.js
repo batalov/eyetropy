@@ -51,7 +51,7 @@ async function classify(path) {
         log.debug(`${cfg.logLabel.tensorFlow}: classification results\n${JSON.stringify(predictions)}`);
 
         return {
-            frame: path.split('/').pop().replace(/thumb[0]*|.jpg/gm, ''),
+            frame: path.split('thumb').pop().replace(/[0]*|.jpg/gm, ''),
             classifiedObjects: predictions
         }
     } catch (e) {
@@ -65,14 +65,11 @@ module.exports.getClassifiedObjectsForImages = async (path) => {
         log.info(`${cfg.logLabel.tensorFlow}: load model`);
         tfModel = await loadModel();
 
-        const dir = `${__dirname.replace('/src', '')}/tmp`;
-        log.info(`${cfg.logLabel.tensorFlow}: start classification process inside ${dir}`);
-
-        log.info(`${cfg.logLabel.tensorFlow}: read filenames`);
+        log.info(`${cfg.logLabel.tensorFlow}: start classification process inside ${cfg.tempDir}`);
         const files = await fs.readdirSync(path);
 
         const classificationResults = await Promise.all(files.map((file) => {
-            return classify(`${dir}/${file}`);
+            return classify(`${cfg.tempDir}/${file}`);
         }));
 
         log.info(`${cfg.logLabel.tensorFlow}: finish classification process \n`);

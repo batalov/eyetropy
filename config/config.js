@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports.cfg = {
     tensorFlow: {
         numberOfChannels: 3
@@ -26,7 +28,7 @@ module.exports.cfg = {
         frameRate: '1',
         timeLength: 5
     },
-    tempDir: './tmp',
+    tempDir: path.normalize('./tmp'),
     logLabel: {
         configValidator: '[config-validator]',
         optionsValidator: '[options-validator]',

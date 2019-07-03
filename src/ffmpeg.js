@@ -5,6 +5,7 @@ const execute = promisify(exec);
 const maxBuffer = {maxBuffer: 1024 * 10000};
 const log = require('loglevel');
 const {cfg} = require('../config/config');
+const path = require('path');
 
 module.exports.getMetaData = async (input) => {
     try {
@@ -12,7 +13,7 @@ module.exports.getMetaData = async (input) => {
         const ffprobe = promisify(ffmpeg.ffprobe);
         const output = await ffprobe(input);
         log.info(`${cfg.logLabel.metaData}: finish collecting meta data \n`);
-        log.debug(`${cfg.logLabel.metaData}: output \n ${output}`);
+        log.debug(`${cfg.logLabel.metaData}: output \n ${JSON.stringify(output)}`);
         return output
     } catch (e) {
         e.message = `${cfg.logLabel.metaData}: error collecting metadata\n${e.message}`;
@@ -255,7 +256,7 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
         for (const value in average) {
             average[value] = average[value] / output.length;
         }
-        log.info('${cfg.logLabel.entropy}: finish measuring entropy');
+        log.info(`${cfg.logLabel.entropy}: finish measuring entropy`);
         log.debug(`${cfg.logLabel.entropy}: output value is\n${{average, output}}`);
         return {average, output}
     } catch (e) {
@@ -267,8 +268,9 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
 module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength) => {
     try {
         const timeArg = formatTimeArg(timeLength);
+        const tmpThumbTemplate = path.normalize('./tmp/') + 'thumb%04d.jpg';
         log.info(`${cfg.logLabel.splitImage}: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`);
-        await execute(`ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ./tmp/thumb%04d.jpg`, maxBuffer);
+        await execute(`ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ${tmpThumbTemplate}`, maxBuffer);
     } catch (e) {
         e.message = `${cfg.logLabel.splitImage}: error splitting video into images\n${e.message}`;
         throw e
