@@ -108,26 +108,6 @@ async function prepareConfig(config) {
     return output
 }
 
-async function test() {
-    const input = '/Users/shmee-macbook-pro/WebstormProjects/test-rtsp-stream/simpsons_noise_and_black_parts.mp4';
-    console.log(JSON.stringify(
-        await eyetropy(input, {detectBlackness: true, detectFreezes: true, detectSilentParts: true
-        }, {
-            detectBlackness: {
-                timeLength: 120
-            },
-            detectFreezes: {
-                timeLength: 120
-            },
-            detectSilentParts: {
-                timeLength: 120
-            },
-        }, 'debug')
-    ))
-}
-
-test();
-
 async function classify(input, config) {
     await checkDir(config.tempDir);
     await cleanUp(config.tempDir);

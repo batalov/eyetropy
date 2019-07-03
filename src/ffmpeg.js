@@ -2,7 +2,6 @@ const ffmpeg = require('fluent-ffmpeg');
 const {promisify} = require('util');
 const {exec} = require('child_process');
 const execute = promisify(exec);
-const maxBuffer = {maxBuffer: 1024 * 10000};
 const log = require('loglevel');
 const {cfg} = require('../config/config');
 const path = require('path');
@@ -25,7 +24,9 @@ module.exports.getVmafMotionAvg = async (input, timeLength) => {
     try {
         log.info(`${cfg.logLabel.vmaf}: start evaluating VMAF Motion Average`);
         const timeArg = formatTimeArg(timeLength);
-        const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -i ${input} -vf vmafmotion -f null -`, maxBuffer);
+        const {stdout, stderr} = await execute(
+            `ffmpeg ${timeArg} -i ${input} -vf vmafmotion -f null -`,
+            cfg.commandLineBuffer);
         const vmafMotionAvg = Number(stderr.match(/(?<=VMAF Motion avg: ).*/gm)[0]);
         log.info(`${cfg.logLabel.vmaf}: finish evaluating VMAF Motion Average`);
         log.debug(`${cfg.logLabel.vmaf}: stdout output \n ${stdout}`);
@@ -42,7 +43,9 @@ module.exports.detectBlack = async (input, timeLength) => {
     try {
         log.info(`${cfg.logLabel.blackDetect}: start detecting black parts`);
         const timeArg = formatTimeArg(timeLength);
-        const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -nostats -i ${input} -vf blackdetect -f null -`, maxBuffer);
+        const {stdout, stderr} = await execute(
+            `ffmpeg ${timeArg} -nostats -i ${input} -vf blackdetect -f null -`,
+            cfg.commandLineBuffer);
         log.debug(`${cfg.logLabel.blackDetect}: stdout \n ${stdout}`);
         log.debug(`${cfg.logLabel.blackDetect}: stderr \n ${stderr}`);
 
@@ -84,7 +87,9 @@ module.exports.detectFreeze = async (input, timeLength) => {
     try {
         log.info(`${cfg.logLabel.freezeDetect}: start detecting freeze parts`);
         const timeArg = formatTimeArg(timeLength);
-        const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -nostats -i ${input} -vf freezedetect -f null -`, maxBuffer);
+        const {stdout, stderr} = await execute(
+            `ffmpeg ${timeArg} -nostats -i ${input} -vf freezedetect -f null -`,
+            cfg.commandLineBuffer);
         log.debug(`${cfg.logLabel.freezeDetect}: stdout \n ${stdout}`);
         log.debug(`${cfg.logLabel.freezeDetect}: stderr \n ${stderr}`);
 
@@ -126,7 +131,9 @@ module.exports.detectSilence = async (input, timeLength) => {
     try {
         log.info(`${cfg.logLabel.silenceDetect}: start detecting silent parts`);
         const timeArg = formatTimeArg(timeLength);
-        const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -nostats -i ${input} -af silencedetect -f null -`, maxBuffer);
+        const {stdout, stderr} = await execute(
+            `ffmpeg ${timeArg} -nostats -i ${input} -af silencedetect -f null -`,
+            cfg.commandLineBuffer);
         log.debug(`${cfg.logLabel.silenceDetect}: stdout \n ${stdout}`);
         log.debug(`${cfg.logLabel.silenceDetect}: stderr \n ${stderr}`);
 
@@ -169,7 +176,9 @@ module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
         const fR = frameRate ? `fps=${frameRate},` : '';
         const timeArg = formatTimeArg(timeLength);
         log.info(`${cfg.logLabel.bitplaneNoise}: start measuring bitplane noise`);
-        const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -i ${input} -vf ${fR}bitplanenoise,metadata=mode=print:file=- -f null -`, maxBuffer);
+        const {stdout, stderr} = await execute(
+            `ffmpeg ${timeArg} -i ${input} -vf ${fR}bitplanenoise,metadata=mode=print:file=- -f null -`,
+            cfg.commandLineBuffer);
         log.debug(`${cfg.logLabel.bitplaneNoise}: stdout\n ${stdout}`);
         log.debug(`${cfg.logLabel.bitplaneNoise}: stderr\n ${stderr}`);
 
@@ -215,7 +224,9 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
         const fR = frameRate ? `fps=${frameRate},` : '';
         const timeArg = formatTimeArg(timeLength);
         log.info(`${cfg.logLabel.entropy}: start measuring entropy`);
-        const {stdout, stderr} = await execute(`ffmpeg ${timeArg} -i ${input} -vf ${fR}entropy,metadata=mode=print:file=- -f null -`, maxBuffer);
+        const {stdout, stderr} = await execute(
+            `ffmpeg ${timeArg} -i ${input} -vf ${fR}entropy,metadata=mode=print:file=- -f null -`,
+            cfg.commandLineBuffer);
         log.debug(`${cfg.logLabel.entropy}: stdout\n ${stdout}`);
         log.debug(`${cfg.logLabel.entropy}: stderr\n ${stderr}`);
 
@@ -268,9 +279,11 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
 module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength) => {
     try {
         const timeArg = formatTimeArg(timeLength);
-        const tmpThumbTemplate = path.normalize('./tmp/') + 'thumb%04d.jpg';
+        const tmpThumbTemplate = path.join(cfg.tempDir, 'thumb%04d.jpg');
         log.info(`${cfg.logLabel.splitImage}: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`);
-        await execute(`ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ${tmpThumbTemplate}`, maxBuffer);
+        await execute(
+            `ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ${tmpThumbTemplate}`,
+            cfg.commandLineBuffer);
     } catch (e) {
         e.message = `${cfg.logLabel.splitImage}: error splitting video into images\n${e.message}`;
         throw e

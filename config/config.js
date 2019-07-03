@@ -43,5 +43,6 @@ module.exports.cfg = {
         splitImage: '[split-image]',
         checkDir: '[check-dir]',
         cleanUp: '[cleanup]'
-    }
+    },
+    commandLineBuffer: {maxBuffer: 1024 * 10000}
 };
