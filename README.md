@@ -3,11 +3,11 @@
 You can get lots of data regarding video file or stream such as:**
 
 * **Basic meta data like codec name/format, video resolution/aspect ratio etc.**
-* **Video VMAF Motion Average value, which describes how much motion is present in the video 
+* **VMAF Motion Average value, which describes how much motion is present in the video 
 and the video quality as perceived by human**
-* **Video fragments, containing black parts**
-* **Video fragments, containing freezes**
-* **Video fragments, containing silence (audiowise)**
+* **Video fragments containing black parts**
+* **Video fragments containing freezes**
+* **Video fragments containing silence (audiowise)**
 * **Average and per frame greyscale entropy**
 * **Average and per frame bitplane noise**
 * **Frame extraction**
