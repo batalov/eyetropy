@@ -1,38 +1,62 @@
 # eyetropy
-**This package is aimed at testing streaming video purposes. 
-You can get some important information about video file or stream such as:**
+**This package is aimed at testing (web) video services. 
+You can get lots of data regarding video file or stream such as:**
 
 * **Basic meta data like codec name/format, video resolution/aspect ratio etc.**
 * **Video VMAF Motion Average value, which describes how much motion is present in the video 
 and the video quality as perceived by human**
-* **Video fragments, containing blackness**
+* **Video fragments, containing black parts**
 * **Video fragments, containing freezes**
 * **Video fragments, containing silence (audiowise)**
 * **Average and per frame greyscale entropy**
 * **Average and per frame bitplane noise**
+* **Frame extraction**
 * **Per frame objects identified by TensorFlow machine learning model**
+* **Per frame meta data, dominant colours, greyscale entropy**
+* **Per frame diff to beforehand prepared images**
 
-## Installation
+## Dependencies
+In order to be able to fully use eyetropy you'll need the following utilities installed on your machine:
+* ffmpeg
+* Tesseract
+* GraphicsMagick
+
+### FFMPEG
+* Installation guides https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg    
+* You'll need a recent git build to have freezedetect included - get one from https://ffmpeg.zeranoe.com/builds/.
+* Direct download link: https://ffmpeg.org/download.html
+    
+### Tesseract
+https://github.com/tesseract-ocr/tesseract#installing-tesseract
+
+### GraphicsMagick
+https://github.com/aheckmann/gm#getting-started
+
+## Eyetropy Installation
 ```npm install eyetropy```
-
-## FFMPEG
-* Installation guides https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg
-
-* Direct download links:
-    https://ffmpeg.org/download.html
-    https://ffmpeg.zeranoe.com/builds/ 
-
 
 ## The Idea
 The whole concept of this package is to provide decent metrics (from simple meta data to more 
-complex metrics) for testing video files or streams. You can use the VMAF Motion Average 
+complex ones) for testing video files or streams. You can use the VMAF Motion Average 
 value to identify how much motion happens on the video as well as the perceived quality of it.
-Additionally you can detect silence, black/freeze parts on your input file/stream. Besides 
+Additionally you can detect silence, black/freeze parts on your input file/stream. Besides, 
 with entropy value you can get an amount of information on the input and with bitplane noise 
-measurement detect the bitplane noise. Combined with the machine learning algorithm, 
-which identifies objects on each video frame, you can have a nice combination of means to get a solid
-foundation capable of telling if your video file or stream is working as expected with no black
-screen/noise, unwanted artifacts or other unexpected things. 
+measurement detect the bitplane noise. Additionaly, it is possible to extract frames
+and get per frame meta data, dominant colours, greyscale entropy or to diff frame to 
+images prepared beforehand; combined with the machine learning algorithm, which identifies 
+objects on each video frame, you can have a comprehensive combination of means to measure if 
+your video file or stream is working as expected with no black screen/noise, 
+unwanted artifacts or other unexpected things. 
+
+## Usecase
+Say you need to test a video streaming web service, more specifically your goal is to
+automate testing process. The general algorithm would be to grab a piece of video -> label
+each frame (draw a frame number on each frame) -> extract frames (to later use as diff images) -> 
+run labelled video through the video service -> grab a video fragment after it's been 
+processed by the service -> compare to expected values (meta data, entropy and so forth) 
+or diff to beforehand prepared images using this module.
+
+For video labelling see https://github.com/batalov/misc
 
 ## Basic Usage
 ```js
@@ -45,312 +69,180 @@ screen/noise, unwanted artifacts or other unexpected things.
     eyetropy('/Users/yourUser/Documents/test.mp4', {vmafMotionAvg: true, metaData: true});
     
     /* get meta data, VMAF Motion Average, detect black/freeze/silent periods,
-     * measure bitplane noise/entropy, classify objects for input source of a m3u playlist
+     * measure bitplane noise/entropy, extract frames for 5 second time period,
+     * get per frame meta data, dominant colours, greyscale entropy;
+     * diff frames to prepared images;
+     * classify objects for each frame input source of a m3u playlist
      * pass log level 'info'
      * pass config object, setting time length in seconds and frame rate (frame per second)
      * for the video segmenting
-     */
+     */ 
     eyetropy('https://coolcam.probably/hls/camera12_2.m3u8',
-                    {vmafMotionAvg: true, 
-                     metaData: true,
-                     detectBlackness: true,
-                     detectFreezes: true,
-                     detectSilentPeriods: true,
-                     measureBitplaneNoise: true,
-                     measureEntropy: true,
-                     classifyObjects: true},
-                    {vmafMotionAvg: {
-                      timeLength: 7
-                    },
-                     detectBlackness: {
-                       timeLength: 7
-                    },
-                     detectFreezes: {
-                       timeLength: 7
-                    },
-                     detectSilentParts: {
-                       timeLength: 7
-                    },
-                     entropy: {
-                       frameRate: '3/1',
-                       timeLength: 7
-                    },
-                     bitplaneNoise: {
-                       frameRate: '3/1',
-                       timeLength: 7
-                    },
-                     splitImages: {
-                       frameRate: '3/1',
-                       timeLength: 7
-                    },
-                    },
-                    'info');
+    {extractFrames: {
+                    classifyObjects: true,
+                    imgMetaData: true,
+                    diffImg: true,
+                    imgDominantColours: true,
+                    imgEntropy: true
+                },
+                vmafMotionAvg: true,
+                metaData: true,
+                detectBlackness: true,
+                detectFreezes: true,
+                detectSilentParts: true,
+                measureEntropy: true,
+                measureBitplaneNoise: true,
+            }, {
+                splitImages: {
+                    frameRate: '1',
+                    timeLength: 5
+                },
+                imgDiff: {
+                    originalImageDir: '/Users/usr/img', 
+                },
+                imgCropper: {
+                    rectangle: {
+                        type: 'bottom-left'
+                    }
+                },
+                imgNumberOcr: {
+                    lang: 'eng',
+                    oem: 1,
+                    psm: 6,
+                    stripNonDigits: true
+                },
+                tensorFlow: {
+                    numberOfChannels: 3,
+                    model: 'mobilenet'
+                },
+                vmafMotionAvg: {
+                    timeLength: 5
+                },
+                detectBlackness: {
+                    timeLength: 5
+                },
+                detectFreezes: {
+                    timeLength: 5
+                },
+                detectSilentParts: {
+                    timeLength: 5
+                },
+                entropy: {
+                    frameRate: '25',
+                    timeLength: 5
+                },
+                bitplaneNoise: {
+                    frameRate: '25',
+                    timeLength: 5
+                },
+            },
+    'info');
 ```
 Output example:
-```
-{
-  "classificationResults": [
-    {
-      "frame": "1",
-      "classifiedObjects": [
-        {
-          "className": "lampshade, lamp shade",
-          "probability": 0.39289921522140503
-        },
-        {
-          "className": "coil, spiral, volute, whorl, helix",
-          "probability": 0.07808805257081985
-        },
-        {
-          "className": "basketball",
-          "probability": 0.07187622785568237
-        }
-      ]
-    },
-    {
-      "frame": "2",
-      "classifiedObjects": [
-        {
-          "className": "chain",
-          "probability": 0.10306758433580399
-        },
-        {
-          "className": "knot",
-          "probability": 0.09443259239196777
-        },
-        {
-          "className": "dial telephone, dial phone",
-          "probability": 0.09123830497264862
-        }
-      ]
-    },
-  ],
-  "metaData": {
-    "streams": [
-      {
-        "index": 0,
-        "codec_name": "mpeg4",
-        "codec_long_name": "MPEG-4 part 2",
-        "profile": "Simple Profile",
-        "codec_type": "video",
-        "codec_time_base": "1001/24000",
-        "codec_tag_string": "mp4v",
-        "codec_tag": "0x7634706d",
-        "width": 1280,
-        "height": 720,
-        "coded_width": 1280,
-        "coded_height": 720,
-        "has_b_frames": 0,
-        "sample_aspect_ratio": "1:1",
-        "display_aspect_ratio": "16:9",
-        "pix_fmt": "yuv420p",
-        "level": 1,
-        "color_range": "unknown",
-        "color_space": "unknown",
-        "color_transfer": "unknown",
-        "color_primaries": "unknown",
-        "chroma_location": "left",
-        "field_order": "unknown",
-        "timecode": "N/A",
-        "refs": 1,
-        "quarter_sample": "false",
-        "divx_packed": "false",
-        "id": "N/A",
-        "r_frame_rate": "24000/1001",
-        "avg_frame_rate": "24000/1001",
-        "time_base": "1/24000",
-        "start_pts": 0,
-        "start_time": 0,
-        "duration_ts": 233233,
-        "duration": 9.718042,
-        "bit_rate": 1128420,
-        "max_bit_rate": 1128420,
-        "bits_per_raw_sample": "N/A",
-        "nb_frames": 233,
-        "nb_read_frames": "N/A",
-        "nb_read_packets": "N/A",
-        "tags": {
-          "language": "und",
-          "handler_name": "Core Media Video"
-        },
-        "disposition": {
-          "default": 1,
-          "dub": 0,
-          "original": 0,
-          "comment": 0,
-          "lyrics": 0,
-          "karaoke": 0,
-          "forced": 0,
-          "hearing_impaired": 0,
-          "visual_impaired": 0,
-          "clean_effects": 0,
-          "attached_pic": 0,
-          "timed_thumbnails": 0
-        }
-      }
-    ],
-    "format": {
-      "filename": "/somefile/file.mp4",
-      "nb_streams": 1,
-      "nb_programs": 0,
-      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
-      "format_long_name": "QuickTime / MOV",
-      "start_time": 0,
-      "duration": 9.719,
-      "size": 1372668,
-      "bit_rate": 1129884,
-      "probe_score": 100,
-      "tags": {
-        "major_brand": "isom",
-        "minor_version": "512",
-        "compatible_brands": "isomiso2mp41",
-        "encoder": "Lavf58.20.100"
-      }
-    },
-    "chapters": []
-  },
-  "vmafMotionAvg": 12.892,
-  "blackPeriods": null,
-  "freezePeriods": null,
-  "silentPeriods": null,
-  "bitplaneNoise": {
-    "average": {
-      "avgBitplaneNoise_O_1": 0.1552558,
-      "avgBitplaneNoise_1_1": 0.14800319999999997,
-      "avgBitplaneNoise_2_1": 0.11773940000000001
-    },
-    "output": [
-      {
-        "second": 0,
-        "bitplaneNoise_O_1": 0.424067,
-        "bitplaneNoise_1_1": 0.312656,
-        "bitplaneNoise_2_1": 0.221675
-      },
-      {
-        "second": 1,
-        "bitplaneNoise_O_1": 0.072244,
-        "bitplaneNoise_1_1": 0.103958,
-        "bitplaneNoise_2_1": 0.08842
-      }
-      }
-    ]
-  },
-  "entropy": {
-    "average": {
-      "avgEntropyNormal_Y": 5.430507,
-      "avgNormalizedEntropy_Y": 0.6788131999999999,
-      "avgEntropyNormal_U": 3.7568126,
-      "avgNormalizedEntropy_U": 0.4696016,
-      "avgEntropyNormal_V": 3.4184449999999997,
-      "avgNormalizedEntropy_V": 0.42730560000000006
-    },
-    "output": [
-      {
-        "second": 0,
-        "entropyNormal_Y": 6.471491,
-        "normalizedEntropy_Y": 0.808936,
-        "entropyNormal_U": 4.402239,
-        "normalizedEntropy_U": 0.55028,
-        "entropyNormal_V": 3.889918,
-        "normalizedEntropy_V": 0.48624
-      },
-      {
-        "second": 1,
-        "entropyNormal_Y": 5.586614,
-        "normalizedEntropy_Y": 0.698327,
-        "entropyNormal_U": 4.07668,
-        "normalizedEntropy_U": 0.509585,
-        "entropyNormal_V": 3.640467,
-        "normalizedEntropy_V": 0.455058
-      }
-    ]
-  }
-}
-```
-Freeze/black/silent parts:
-```
-{
-  "blackParts": [
-    {
-      "blackStart": 10.4271,
-      "blackEnd": 14.4311,
-      "blackDuration": 4.004
-    },
-    {
-      "blackStart": 88.1297,
-      "blackEnd": 92.1337,
-      "blackDuration": 4.004
-    }
-  ],
-  "freezeParts": [
-    {
-      "freezeStart": 0,
-      "freezeEnd": 4.17083,
-      "freezeDuration": 4.17083
-    },
-    {
-      "freezeStart": 10.4271,
-      "freezeEnd": 14.4311,
-      "freezeDuration": 4.004
-    },
-    {
-      "freezeStart": 88.1297,
-      "freezeEnd": 92.1337,
-      "freezeDuration": 4.004
-    }
-  ],
-  "silentParts": [
-    {
-      "silenceStart": 0.0879792,
-      "silenceEnd": 5.69046,
-      "silenceDuration": 5.60248
-    },
-    {
-      "silenceStart": 10.4699,
-      "silenceEnd": 14.4782,
-      "silenceDuration": 4.00823
-    },
-    {
-      "silenceStart": 24.1095,
-      "silenceEnd": 28.1141,
-      "silenceDuration": 4.0046
-    },
-    {
-      "silenceStart": 47.7979,
-      "silenceEnd": 51.8054,
-      "silenceDuration": 4.00746
-    },
-    {
-      "silenceStart": 69.5935,
-      "silenceEnd": 75.8659,
-      "silenceDuration": 6.27233
-    },
-    {
-      "silenceStart": 88.1705,
-      "silenceEnd": 92.1828,
-      "silenceDuration": 4.01229
-    },
-    {
-      "silenceStart": 106.698,
-      "silenceEnd": 110.697,
-      "silenceDuration": 3.9989
-    }
-  ]
-}
-```
+https://gist.github.com/batalov/cb788744a236e62b34d3798bf3a82570
+
+Freeze/black/silent parts output:
+https://gist.github.com/batalov/06bd549210cac746efcf670983eaf6d4
+
+## Config options
+You can configure a lot of options in the config object, passing it as third argument.
+
+Config example:
+https://gist.github.com/batalov/7a4da6d2e24fdf91a4bcfba594b8dbc5
+### Config structure:
+#### tensorFlow
+* numberOfChannels - number of colour channels (default 3)
+* model - tensorFlow model: either coco ssd or mobilenet (default mobilenet) 
+#### vmafMotionAvg
+* timeLength - number of seconds during which VMAF Motion Avg will be evaluated (default 5)
+#### detectBlackness
+* timeLength - number of seconds during which black parts will be detected (default 5)
+#### detectFreezes
+* timeLength - number of seconds during which freeze parts will be detected (default 5)
+#### detectSilentParts
+* timeLength - number of seconds during which silent parts will be detected (default 5)
+#### entropy
+* frameRate - number of fps (frame per second) for video (default 1); to change frame rate
+for special case use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds 
+* timeLength - number of seconds during which greyscale entropy will be evaluated (default 5)
+#### bitplaneNoise
+* frameRate - number of fps (frame per second) for video (default 1); to change frame rate
+for special case use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds 
+* timeLength - number of seconds during which bit plane noise will be evaluated (default 5)
+#### splitImages
+* frameRate - number of fps (frame per second) for video (default 1); to change frame rate
+for special case use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds 
+* timeLength - number of seconds during which video will be split into images (default 5)
+#### frameExtractionTempDir
+* directory for frame extraction
+#### imgNumberOcrTempDir
+* directory for img ocr process; used for image ocr for further mapping of extracted and
+prepared images
+#### imgCropper
+* configuration for cropping and image normalization process; used to crop, resize, normalize
+image for further number ocr process
+##### bwThreshold
+* used to transform image to b-w colours http://sharp.pixelplumbing.com/en/stable/api-operation/#threshold
+##### rectangle
+Sets the cropping rectangle. Can be set to one of: top-left, bottom-left, bottom-right, top-right, custom; 
+custom allows you set the dimensions of rectangle manually.
+Default dimensions and coordinates of rectangle:
+* width - 7% of image total width (Math.floor((imgMetaData.width / 100) * 7)
+* height - 3% of image total height (Math.floor((imgMetaData.height / 100) * 3))
+* top-left coordinates are top: 0, left: 0
+* bottom-left coordinates are top: image total height - config.imgCropper.height, left: 0
+* bottom-right coordinates are top: image total height - config.imgCropper.height, left: image total width - config.imgCropper.width
+* top-right coordinates are top: 0, left: image total width - config.imgCropper.width
+##### width
+* sets the cropping rectangle width
+##### height
+* sets the cropping rectangle height
+##### left
+* sets the cropping rectangle x axis position
+##### top
+* sets the cropping rectangle y axis position
+#### imgNumberOcr
+Configures Tesseract OCR Engine
+##### lang
+* language (default eng)
+##### oem
+* Tesseract OCR Engine (default 1)
+##### psm
+* Tesseract OCR page segmentaion (default 6); https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
+##### stripNonDigits
+* Strips off all non digits (default true)
+#### imgDiff
+##### originalImageDir
+* Sets the directory with images to diff with
 
 ## General Notes
-* Bare in mind that increasing values of frame rate and time length properties also increase 
-the overall time required for execution
-* If your goal is testing some service with video processing, the best practice would be
-to prepare some video file or stream with known expected test values
+* If your goal is testing some web service with video processing, the best practice 
+would be to prepare video file (to use it as a stream later) with known expected 
+test values. In my case image preparation included the following: i labeled each frame 
+with a white rectangle, containing number of frame and then extracted frames with ffmpeg
+* Frame labelling using ffmpeg
+```bash
+ffmpeg -i you_file.mp4 -vf "drawbox=x=0:y=690:w=70:h=100:color=white:t=fill","drawtext=fontfile=/path_to_font_directory/Arial.ttf:text=%{n}:fontcolor=black@1: x=5: y=700" output.mp4
+``` 
+* Frame extraction starting from zero
+```bash
+ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner ./your_directory/img/thumb%04d.jpg
+```
+* One of the most straightforward ways to ensure your video is working as expected is 
+to diff extracted frames to previously prepared ones
+* In order to be able to use diff image feature you would also need to set directory with
+prepared images in the config and label each image with a corresponding number in the file name
+ e.g. "thumb_0.jpg", "thumb0.jpg", "0.jpg". Diff feature expects that file name corresponds
+ the number label on the image itself 
 * In terms of interpretation of VMAF Motion Average score i would recommend reading related 
 articles in the Additional Information
 * Entropy metric is quite reliable in detecting how much information is on the video, but 
-the thing to consider is that it will show a high value for white noise
-* Bitplane noise metric can be quite useful to get the colour info
+the thing to consider is that it will still calculate high value for white noise
+* Bitplane noise metric can be quite useful for noise detection or to get the colour info
 * The input (file/stream uri, options/config/logLevel params) to this module gets through 
 a strict validation process
+* Bare in mind that increasing values of frame rate and time length properties also increase 
+the overall time required for execution
 
 ## Additional Information
 * VMAF by Netflix: https://medium.com/netflix-techblog/toward-a-practical-perceptual-video-quality-metric-653f208b9652
@@ -360,6 +252,9 @@ https://medium.com/netflix-techblog/vmaf-the-journey-continues-44b51ee9ed12
 * https://www.tensorflow.org/js
 * TensorFlow js models: https://github.com/tensorflow/tfjs-models
 * Work on image integrity: https://pdfs.semanticscholar.org/f58b/216a76718854345b0f70637b14da6a1888cc.pdf?_ga=2.44905700.1550178958.1558516626-1913169076.1558516626
-* Grayscale entropy: https://stats.stackexchange.com/questions/235270/entropy-of-an-image
-* Fresh ffmpeg builds https://ffmpeg.zeranoe.com/builds/
-* ffmpeg installation instructions https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg
+* Greyscale entropy: https://stats.stackexchange.com/questions/235270/entropy-of-an-image
+* Tesseract OCR page segmentation https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
+* Webdriver io implementation of screen capture of certain html element using ffmpeg
+https://gist.github.com/batalov/3d465a9480a004acfb461648164f3e80 
+* Video labelling examples https://github.com/batalov/misc
+
