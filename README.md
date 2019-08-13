@@ -1,19 +1,19 @@
 # eyetropy
-**This package is aimed at testing (web) video services. 
-You can get lots of data regarding video file or stream such as:**
+This package is aimed at testing (web) video services. 
+You can get lots of data regarding video file or stream such as:
 
-* **Basic meta data like codec name/format, video resolution/aspect ratio etc.**
-* **VMAF Motion Average value, which describes how much motion is present in the video 
-and the video quality as perceived by human**
-* **Video fragments containing black parts**
-* **Video fragments containing freezes**
-* **Video fragments containing silence (audiowise)**
-* **Average and per frame greyscale entropy**
-* **Average and per frame bitplane noise**
-* **Frame extraction**
-* **Per frame objects identified by TensorFlow machine learning model**
-* **Per frame meta data, dominant colours, greyscale entropy**
-* **Per frame diff to beforehand prepared images**
+* Basic meta data like codec name/format, video resolution/aspect ratio etc.
+* VMAF Motion Average value, which describes how much motion is present in the video 
+and the video quality as perceived by human
+* Video fragments containing black parts
+* Video fragments containing freezes
+* Video fragments containing silence (audiowise)
+* Average and per frame greyscale entropy
+* Average and per frame bitplane noise
+* Frame extraction
+* Per frame objects identified by TensorFlow machine learning model
+* Per frame meta data, dominant colours, greyscale entropy
+* Per frame diff to beforehand prepared images
 
 ## Dependencies
 In order to be able to fully use eyetropy you'll need the following utilities installed on your machine:
