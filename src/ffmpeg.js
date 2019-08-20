@@ -7,57 +7,60 @@ const { cfg } = require('../config/config');
 const path = require('path');
 
 module.exports.getMetaData = async input => {
+  const metaDataLogLabel = cfg.logLabel.metaData;
   try {
-    log.info(`${cfg.logLabel.metaData}: start collecting meta data`);
+    log.info(`${metaDataLogLabel}: start collecting meta data`);
     const ffprobe = promisify(ffmpeg.ffprobe);
     const output = await ffprobe(input);
-    log.info(`${cfg.logLabel.metaData}: finish collecting meta data \n`);
-    log.debug(`${cfg.logLabel.metaData}: output \n ${JSON.stringify(output)}`);
+    log.info(`${metaDataLogLabel}: finish collecting meta data \n`);
+    log.debug(`${metaDataLogLabel}: output \n ${JSON.stringify(output)}`);
     return output;
   } catch (e) {
-    e.message = `${cfg.logLabel.metaData}: error collecting metadata\n${e.message}`;
+    e.message = `${metaDataLogLabel}: error collecting metadata\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.getVmafMotionAvg = async (input, timeLength) => {
+  const vmafLogLabel = cfg.logLabel.vmaf;
   try {
-    log.info(`${cfg.logLabel.vmaf}: start evaluating VMAF Motion Average`);
+    log.info(`${vmafLogLabel}: start evaluating VMAF Motion Average`);
     const timeArg = formatTimeArg(timeLength);
     const { stdout, stderr } = await execute(
       `ffmpeg ${timeArg} -i ${input} -vf vmafmotion -f null -`,
       cfg.commandLineBuffer,
     );
     const vmafMotionAvg = Number(stderr.match(/(?<=VMAF Motion avg: ).*/gm)[0]);
-    log.info(`${cfg.logLabel.vmaf}: finish evaluating VMAF Motion Average`);
-    log.debug(`${cfg.logLabel.vmaf}: stdout output \n ${stdout}`);
-    log.debug(`${cfg.logLabel.vmaf}: stderr output \n ${stderr}`);
-    log.debug(`${cfg.logLabel.vmaf}: value ${vmafMotionAvg}`);
+    log.info(`${vmafLogLabel}: finish evaluating VMAF Motion Average`);
+    log.debug(`${vmafLogLabel}: stdout output \n ${stdout}`);
+    log.debug(`${vmafLogLabel}: stderr output \n ${stderr}`);
+    log.debug(`${vmafLogLabel}: value ${vmafMotionAvg}`);
     return vmafMotionAvg;
   } catch (e) {
-    e.message = `${cfg.logLabel.vmaf}: error evaluating VMAF Motion Average\n${e.message}`;
+    e.message = `${vmafLogLabel}: error evaluating VMAF Motion Average\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.detectBlack = async (input, timeLength) => {
+  const blackDetectLogLabel = cfg.logLabel.blackDetect;
   try {
-    log.info(`${cfg.logLabel.blackDetect}: start detecting black parts`);
+    log.info(`${blackDetectLogLabel}: start detecting black parts`);
     const timeArg = formatTimeArg(timeLength);
     const { stdout, stderr } = await execute(
       `ffmpeg ${timeArg} -nostats -i ${input} -vf blackdetect -f null -`,
       cfg.commandLineBuffer,
     );
-    log.debug(`${cfg.logLabel.blackDetect}: stdout \n ${stdout}`);
-    log.debug(`${cfg.logLabel.blackDetect}: stderr \n ${stderr}`);
+    log.debug(`${blackDetectLogLabel}: stdout \n ${stdout}`);
+    log.debug(`${blackDetectLogLabel}: stderr \n ${stderr}`);
 
     const collectedBlackParts = stderr.match(/black_start:[\s\d.]*|black_end:[\s\d.]*|black_duration:[\s\d.]*/gm);
-    log.debug(`${cfg.logLabel.blackDetect}: split regular expression value\n${collectedBlackParts}`);
+    log.debug(`${blackDetectLogLabel}: split regular expression value\n${collectedBlackParts}`);
 
     if (collectedBlackParts !== null) {
       const pattern = /black_(start|end|duration):[\s\.\d]*,black_(start|end|duration):[\s\.\d]*,black_(start|end|duration):[\s\.\d]*/gm;
       const splitBlackParts = collectedBlackParts.join(',').match(pattern);
-      log.debug(`${cfg.logLabel.blackDetect}: group split regular expression value\n${splitBlackParts}`);
+      log.debug(`${blackDetectLogLabel}: group split regular expression value\n${splitBlackParts}`);
 
       if (splitBlackParts !== null) {
         return splitBlackParts.map(fragment => {
@@ -74,35 +77,36 @@ module.exports.detectBlack = async (input, timeLength) => {
     if (collectedBlackParts === null && stderr.match(/blackdetect/gm)) {
       return stderr.match(/blackdetect.*/gm);
     }
-    log.info(`${cfg.logLabel.blackDetect}: finish detecting black parts`);
-    log.debug(`${cfg.logLabel.blackDetect}: output result\n${collectedBlackParts}`);
+    log.info(`${blackDetectLogLabel}: finish detecting black parts`);
+    log.debug(`${blackDetectLogLabel}: output result\n${collectedBlackParts}`);
 
     // returns null if no parts were found
     return collectedBlackParts;
   } catch (e) {
-    e.message = `${cfg.logLabel.blackDetect}: error detecting black parts\n${e.message}`;
+    e.message = `${blackDetectLogLabel}: error detecting black parts\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.detectFreeze = async (input, timeLength) => {
+  const freezeDetectLogLabel = cfg.logLabel.freezeDetect;
   try {
-    log.info(`${cfg.logLabel.freezeDetect}: start detecting freeze parts`);
+    log.info(`${freezeDetectLogLabel}: start detecting freeze parts`);
     const timeArg = formatTimeArg(timeLength);
     const { stdout, stderr } = await execute(
       `ffmpeg ${timeArg} -nostats -i ${input} -vf freezedetect -f null -`,
       cfg.commandLineBuffer,
     );
-    log.debug(`${cfg.logLabel.freezeDetect}: stdout \n ${stdout}`);
-    log.debug(`${cfg.logLabel.freezeDetect}: stderr \n ${stderr}`);
+    log.debug(`${freezeDetectLogLabel}: stdout \n ${stdout}`);
+    log.debug(`${freezeDetectLogLabel}: stderr \n ${stderr}`);
 
     const collectedFreezeParts = stderr.match(/freeze_start:[\s\d.]*|freeze_end:[\s\d.]*|freeze_duration:[\s\d.]*/gm);
-    log.debug(`${cfg.logLabel.freezeDetect}: split regular expression value\n${collectedFreezeParts}`);
+    log.debug(`${freezeDetectLogLabel}: split regular expression value\n${collectedFreezeParts}`);
 
     if (collectedFreezeParts !== null) {
       const pattern = /freeze_(start|end|duration):[\s\.\d]*,freeze_(start|end|duration):[\s\.\d]*,freeze_(start|end|duration):[\s\.\d]*/gm;
       const splitFreezeParts = collectedFreezeParts.join(',').match(pattern);
-      log.debug(`${cfg.logLabel.freezeDetect}: group split regular expression value\n${splitFreezeParts}`);
+      log.debug(`${freezeDetectLogLabel}: group split regular expression value\n${splitFreezeParts}`);
 
       if (splitFreezeParts !== null) {
         return splitFreezeParts.map(fragment => {
@@ -119,37 +123,38 @@ module.exports.detectFreeze = async (input, timeLength) => {
     if (collectedFreezeParts === null && stderr.match(/freezedetect/gm)) {
       return stderr.match(/freezedetect.*/gm);
     }
-    log.info(`${cfg.logLabel.freezeDetect}: finish detecting freeze parts`);
-    log.debug(`${cfg.logLabel.freezeDetect}: output result\n${collectedFreezeParts}`);
+    log.info(`${freezeDetectLogLabel}: finish detecting freeze parts`);
+    log.debug(`${freezeDetectLogLabel}: output result\n${collectedFreezeParts}`);
 
     // returns null if no parts were found
     return collectedFreezeParts;
   } catch (e) {
-    e.message = `${cfg.logLabel.freezeDetect}: error detecting freeze parts\n${e.message}`;
+    e.message = `${freezeDetectLogLabel}: error detecting freeze parts\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.detectSilence = async (input, timeLength) => {
+  const silenceDetectLogLabel = cfg.logLabel.silenceDetect;
   try {
-    log.info(`${cfg.logLabel.silenceDetect}: start detecting silent parts`);
+    log.info(`${silenceDetectLogLabel}: start detecting silent parts`);
     const timeArg = formatTimeArg(timeLength);
     const { stdout, stderr } = await execute(
       `ffmpeg ${timeArg} -nostats -i ${input} -af silencedetect -f null -`,
       cfg.commandLineBuffer,
     );
-    log.debug(`${cfg.logLabel.silenceDetect}: stdout \n ${stdout}`);
-    log.debug(`${cfg.logLabel.silenceDetect}: stderr \n ${stderr}`);
+    log.debug(`${silenceDetectLogLabel}: stdout \n ${stdout}`);
+    log.debug(`${silenceDetectLogLabel}: stderr \n ${stderr}`);
 
     const collectedSilentParts = stderr.match(
       /silence_start:[\s\d.]*|silence_end:[\s\d.]*|silence_duration:[\s\d.]*/gm,
     );
-    log.debug(`${cfg.logLabel.silenceDetect}: split regular expression value\n${collectedSilentParts}`);
+    log.debug(`${silenceDetectLogLabel}: split regular expression value\n${collectedSilentParts}`);
 
     if (collectedSilentParts !== null) {
       const pattern = /silence_(start|end|duration):[\s\.\d]*,silence_(start|end|duration):[\s\.\d]*,silence_(start|end|duration):[\s\.\d]*/gm;
       const splitSilentParts = collectedSilentParts.join(',').match(pattern);
-      log.debug(`${cfg.logLabel.silenceDetect}: group split regular expression value\n${splitSilentParts}`);
+      log.debug(`${silenceDetectLogLabel}: group split regular expression value\n${splitSilentParts}`);
 
       if (splitSilentParts !== null) {
         return splitSilentParts.map(fragment => {
@@ -166,31 +171,32 @@ module.exports.detectSilence = async (input, timeLength) => {
     if (collectedSilentParts === null && stderr.match(/silencedetect/gm)) {
       return stderr.match(/silencedetect.*/gm);
     }
-    log.info(`${cfg.logLabel.silenceDetect}: finish detecting silent parts`);
-    log.debug(`${cfg.logLabel.silenceDetect}: output result\n${collectedSilentParts}`);
+    log.info(`${silenceDetectLogLabel}: finish detecting silent parts`);
+    log.debug(`${silenceDetectLogLabel}: output result\n${collectedSilentParts}`);
 
     // returns null if no parts were found
     return collectedSilentParts;
   } catch (e) {
-    e.message = `${cfg.logLabel.silenceDetect}: error detecting silent parts\n${e.message}`;
+    e.message = `${silenceDetectLogLabel}: error detecting silent parts\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
+  const bitplaneNoiseLogLabel = cfg.logLabel.bitplaneNoise;
   try {
     const fR = frameRate ? `fps=${frameRate},` : '';
     const timeArg = formatTimeArg(timeLength);
-    log.info(`${cfg.logLabel.bitplaneNoise}: start measuring bitplane noise`);
+    log.info(`${bitplaneNoiseLogLabel}: start measuring bitplane noise`);
     const { stdout, stderr } = await execute(
       `ffmpeg ${timeArg} -i ${input} -vf ${fR}bitplanenoise,metadata=mode=print:file=- -f null -`,
       cfg.commandLineBuffer,
     );
-    log.debug(`${cfg.logLabel.bitplaneNoise}: stdout\n ${stdout}`);
-    log.debug(`${cfg.logLabel.bitplaneNoise}: stderr\n ${stderr}`);
+    log.debug(`${bitplaneNoiseLogLabel}: stdout\n ${stdout}`);
+    log.debug(`${bitplaneNoiseLogLabel}: stderr\n ${stderr}`);
 
     const splitOutput = stdout.match(/.*\n.*\n.*\n.*\n/gm);
-    log.debug(`${cfg.logLabel.bitplaneNoise}: regular expression value\n ${splitOutput}`);
+    log.debug(`${bitplaneNoiseLogLabel}: regular expression value\n ${splitOutput}`);
 
     const output = [];
     const average = {
@@ -217,29 +223,30 @@ module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
     for (const value in average) {
       average[value] /= output.length;
     }
-    log.info(`${cfg.logLabel.bitplaneNoise}: finish measuring bitplane noise`);
-    log.debug(`${cfg.logLabel.bitplaneNoise}: output value is\n${{ average, output }}`);
+    log.info(`${bitplaneNoiseLogLabel}: finish measuring bitplane noise`);
+    log.debug(`${bitplaneNoiseLogLabel}: output value is\n${{ average, output }}`);
     return { average, output };
   } catch (e) {
-    e.message = `${cfg.logLabel.bitplaneNoise}: error measuring bitplane noise\n${e.message}`;
+    e.message = `${bitplaneNoiseLogLabel}: error measuring bitplane noise\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.measureEntropy = async (input, frameRate, timeLength) => {
+  const entropyLogLabel = cfg.logLabel.entropy;
   try {
     const fR = frameRate ? `fps=${frameRate},` : '';
     const timeArg = formatTimeArg(timeLength);
-    log.info(`${cfg.logLabel.entropy}: start measuring entropy`);
+    log.info(`${entropyLogLabel}: start measuring entropy`);
     const { stdout, stderr } = await execute(
       `ffmpeg ${timeArg} -i ${input} -vf ${fR}entropy,metadata=mode=print:file=- -f null -`,
       cfg.commandLineBuffer,
     );
-    log.debug(`${cfg.logLabel.entropy}: stdout\n ${stdout}`);
-    log.debug(`${cfg.logLabel.entropy}: stderr\n ${stderr}`);
+    log.debug(`${entropyLogLabel}: stdout\n ${stdout}`);
+    log.debug(`${entropyLogLabel}: stderr\n ${stderr}`);
 
     const splitOutput = stdout.match(/.*\n.*\n.*\n.*\n.*\n.*\n.*\n/gm);
-    log.debug(`${cfg.logLabel.entropy}: regular expression value\n ${splitOutput}`);
+    log.debug(`${entropyLogLabel}: regular expression value\n ${splitOutput}`);
 
     const output = [];
     const average = {
@@ -275,30 +282,29 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
     for (const value in average) {
       average[value] /= output.length;
     }
-    log.info(`${cfg.logLabel.entropy}: finish measuring entropy`);
-    log.debug(`${cfg.logLabel.entropy}: output value is\n${{ average, output }}`);
+    log.info(`${entropyLogLabel}: finish measuring entropy`);
+    log.debug(`${entropyLogLabel}: output value is\n${{ average, output }}`);
     return { average, output };
   } catch (e) {
-    e.message = `${cfg.logLabel.entropy}: error measuring entropy\n${e.message}`;
+    e.message = `${entropyLogLabel}: error measuring entropy\n${e.message}`;
     throw e;
   }
 };
 
 module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength) => {
+  const splitImageLogLabel = cfg.logLabel.splitImage;
   try {
     const timeArg = formatTimeArg(timeLength);
     const tmpThumbTemplate = path.join(cfg.frameExtractionTempDir, 'thumb%04d.jpg');
     log.info(
-      `${
-        cfg.logLabel.splitImage
-      }: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`,
+      `${splitImageLogLabel}: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`,
     );
     await execute(
       `ffmpeg ${timeArg} -i ${input} -vf fps=${frameRate} -hide_banner ${tmpThumbTemplate}`,
       cfg.commandLineBuffer,
     );
   } catch (e) {
-    e.message = `${cfg.logLabel.splitImage}: error splitting video into images\n${e.message}`;
+    e.message = `${splitImageLogLabel}: error splitting video into images\n${e.message}`;
     throw e;
   }
 };

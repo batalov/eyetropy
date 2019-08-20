@@ -2,6 +2,8 @@ const joi = require('joi');
 const log = require('loglevel');
 const { cfg } = require('../config/config');
 
+const optionsValidatorLogLabel = cfg.logLabel.optionsValidator;
+
 async function validateOptions(options) {
   log.info(`${cfg.logLabel.optionsValidator}: validate options`);
   const schema = joi.object().keys({
@@ -23,9 +25,9 @@ async function validateOptions(options) {
 
   try {
     await joi.validate(options, schema, { abortEarly: false });
-    log.info(`${cfg.logLabel.optionsValidator}: successfully validated options`);
+    log.info(`${optionsValidatorLogLabel}: successfully validated options`);
   } catch (e) {
-    e.message = `${cfg.logLabel.optionsValidator}: options parameters validation failure: ${e.message}`;
+    e.message = `${optionsValidatorLogLabel}: options parameters validation failure: ${e.message}`;
     throw e;
   }
 }

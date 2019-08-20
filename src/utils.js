@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+
 const readdir = promisify(fs.readdir);
 const unlink = promisify(fs.unlink);
 const log = require('loglevel');
@@ -9,32 +10,34 @@ const promise = require('bluebird');
 const { cfg } = require('../config/config');
 
 module.exports.makeDir = function(dir) {
+  const mkDirLogLabel = cfg.logLabel.mkDir;
   try {
-    log.info(`${cfg.logLabel.mkDir}: start checking directory for existence`);
+    log.info(`${mkDirLogLabel}: start checking directory for existence`);
     if (fs.existsSync(dir)) {
-      log.info(`${cfg.logLabel.mkDir}: directory ${dir} exists`);
+      log.info(`${mkDirLogLabel}: directory ${dir} exists`);
     } else {
-      log.info(`${cfg.logLabel.mkDir}: directory ${dir} does not exist, making dir ${dir}`);
+      log.info(`${mkDirLogLabel}: directory ${dir} does not exist, making dir ${dir}`);
       fs.mkdirSync(dir);
     }
   } catch (e) {
-    e.message = `${cfg.logLabel.mkDir}: error making directory \n${e.message}`;
+    e.message = `${mkDirLogLabel}: error making directory \n${e.message}`;
     throw e;
   }
 };
 
 module.exports.cleanUpDir = async function(dir) {
+  const cleanupDirLogLabel = cfg.logLabel.cleanUp;
   try {
     if (fs.existsSync(dir)) {
-      log.info(`${cfg.logLabel.cleanUp}: start cleanup for ${dir}`);
+      log.info(`${cleanupDirLogLabel}: start cleanup for ${dir}`);
       const files = await readdir(dir);
       files.forEach(async file => {
         await unlink(path.join(dir, file));
       });
-      log.info(`${cfg.logLabel.cleanUp}: finish cleanup process\n`);
+      log.info(`${cleanupDirLogLabel}: finish cleanup process\n`);
     }
   } catch (e) {
-    e.message = `${cfg.logLabel.cleanUp}: error cleaning up directory\n${e.message}`;
+    e.message = `${cleanupDirLogLabel}: error cleaning up directory\n${e.message}`;
     throw e;
   }
 };
@@ -48,12 +51,13 @@ module.exports.setLogLevel = function(logLevel) {
 };
 
 module.exports.removeDir = async function(dir) {
+  const rmDirLogLabel = cfg.logLabel.rmDir;
   try {
-    log.info(`${cfg.logLabel.rmDir}: removing dir ${dir}`);
+    log.info(`${rmDirLogLabel}: removing dir ${dir}`);
     const rmrf = promise.promisifyAll(rimraf);
     await rmrf(dir, () => {});
   } catch (e) {
-    e.message = `${cfg.logLabel.rmDir}: error removing directory\n${e.message}`;
+    e.message = `${rmDirLogLabel}: error removing directory\n${e.message}`;
     throw e;
   }
 };

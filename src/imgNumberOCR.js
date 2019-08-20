@@ -4,9 +4,11 @@ const Promise = require('bluebird');
 const tesseract = Promise.promisifyAll(require('node-tesseract-ocr'));
 const { cfg } = require('../config/config');
 
+const imgOcrLogLabel = cfg.logLabel.imgOcr;
+
 module.exports.imgNumberOcr = async function(input, config) {
   try {
-    log.info(`${cfg.logLabel.imgOcr}: start image OCR process`);
+    log.info(`${imgOcrLogLabel}: start image OCR process`);
     if (!config.imgNumberOcr) {
       config.imgNumberOcr = {
         stripNonDigits: true,
@@ -22,10 +24,10 @@ module.exports.imgNumberOcr = async function(input, config) {
       psm: config.imgNumberOcr.psm,
     });
 
-    log.info(`${cfg.logLabel.imgOcr}: finish image OCR process`);
+    log.info(`${imgOcrLogLabel}: finish image OCR process`);
     return results;
   } catch (e) {
-    e.message = `${cfg.logLabel.imgOcr}: error evaluating image OCR\n${e.message}`;
+    e.message = `${imgOcrLogLabel}: error evaluating image OCR\n${e.message}`;
     throw e;
   }
 };

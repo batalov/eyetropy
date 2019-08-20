@@ -125,7 +125,7 @@ async function prepareConfig(config) {
 
 async function labelImg(input, config) {
   await cropAndNormalizeImage(input, config);
-  return await imgNumberOcr(input, config);
+  return imgNumberOcr(input, config);
 }
 
 async function handleFrameExtraction(input, options, config) {

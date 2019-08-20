@@ -2,6 +2,8 @@ const sharp = require('sharp');
 const log = require('loglevel');
 const { cfg } = require('../config/config');
 
+const imgEntropyLogLabel = cfg.logLabel.imgEntropy;
+
 module.exports.evaluateEntropy = async input => {
   const buf = await sharp(input)
     .toColourspace('b-w')
@@ -12,7 +14,7 @@ module.exports.evaluateEntropy = async input => {
   const height = metaData.height;
   const width = metaData.width;
 
-  log.debug(`${cfg.logLabel.imgEntropy}: computing probabilities`);
+  log.debug(`${imgEntropyLogLabel}: computing probabilities`);
 
   const probLen = 256 * 2 - 1;
   const probabilities = new Uint32Array(probLen);
@@ -25,9 +27,9 @@ module.exports.evaluateEntropy = async input => {
       }
     }
   }
-  log.debug(`${cfg.logLabel.imgEntropy}: finish computing probabilities`);
+  log.debug(`${imgEntropyLogLabel}: finish computing probabilities`);
 
-  log.info(`${cfg.logLabel.imgEntropy}: computing entropy`);
+  log.info(`${imgEntropyLogLabel}: computing entropy`);
 
   const total = probabilities.reduce((total, current) => total + current, 0);
   let entropy = 0;
@@ -41,7 +43,7 @@ module.exports.evaluateEntropy = async input => {
   }
 
   entropy = entropy / Math.log(2);
-  log.info(`${cfg.logLabel.imgEntropy}: finish computing entropy with ${entropy} value`);
+  log.info(`${imgEntropyLogLabel}: finish computing entropy with ${entropy} value`);
 
   return entropy;
 };

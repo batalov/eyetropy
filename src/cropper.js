@@ -1,17 +1,18 @@
 const path = require('path');
 const log = require('loglevel');
-const { cfg } = require('../config/config');
 const sharp = require('sharp');
+const { cfg } = require('../config/config');
+const imgCropperLogLabel = cfg.logLabel.imgCropper;
 
 module.exports.cropAndNormalizeImage = async function(input, config) {
   try {
     log.info(
-      `${cfg.logLabel.imgCropper}: start reading, b-w normalizing, cropping ` +
+      `${imgCropperLogLabel}: start reading, b-w normalizing, cropping ` +
         `buffer with ${config.imgCropper.bwThreshold} threshold`,
     );
 
     const imgMetaData = await sharp(input).metadata();
-    log.debug(`${cfg.logLabel.imgCropper}: image dimensions: ${imgMetaData.width} x ${imgMetaData.height}`);
+    log.debug(`${imgCropperLogLabel}: image dimensions: ${imgMetaData.width} x ${imgMetaData.height}`);
 
     if (config.imgCropper.rectangle) {
       config.imgCropper.width = config.imgCropper.width || Math.floor((imgMetaData.width / 100) * 7);
@@ -34,7 +35,7 @@ module.exports.cropAndNormalizeImage = async function(input, config) {
       }
     }
 
-    log.debug(`${cfg.logLabel.imgCropper}: rectangle dimensions: ${JSON.stringify(config.imgCropper)}`);
+    log.debug(`${imgCropperLogLabel}: rectangle dimensions: ${JSON.stringify(config.imgCropper)}`);
 
     let buf = await sharp(input)
       .extract({
@@ -56,7 +57,7 @@ module.exports.cropAndNormalizeImage = async function(input, config) {
         .toBuffer();
     }
 
-    log.info(`${cfg.logLabel.imgCropper}: write to file`);
+    log.info(`${imgCropperLogLabel}: write to file`);
     await sharp(buf)
       .extend({
         left: 0,
@@ -67,9 +68,9 @@ module.exports.cropAndNormalizeImage = async function(input, config) {
       })
       .toFile(imgPath);
 
-    log.info(`${cfg.logLabel.imgCropper}: finish cropping image`);
+    log.info(`${imgCropperLogLabel}: finish cropping image`);
   } catch (e) {
-    e.message = `${cfg.logLabel.imgCropper}: error cropping image\n${e.message}`;
+    e.message = `${imgCropperLogLabel}: error cropping image\n${e.message}`;
     throw e;
   }
 };

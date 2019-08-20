@@ -2,8 +2,10 @@ const joi = require('joi');
 const log = require('loglevel');
 const { cfg } = require('../config/config');
 
+const configValidatorLogLabel = cfg.logLabel.configValidator;
+
 async function validateConfig(config) {
-  log.info(`${cfg.logLabel.configValidator}: validate config`);
+  log.info(`${configValidatorLogLabel}: validate config`);
   const schema = joi.object().keys({
     tensorFlow: joi.object().keys({
       numberOfChannels: joi
@@ -91,9 +93,9 @@ async function validateConfig(config) {
 
   try {
     await joi.validate(config, schema, { abortEarly: false });
-    log.info(`${cfg.logLabel.configValidator}: successfully validated config`);
+    log.info(`${configValidatorLogLabel}: successfully validated config`);
   } catch (e) {
-    e.message = `${cfg.logLabel.configValidator}: config parameters validation failure: ${e.message}`;
+    e.message = `${configValidatorLogLabel}: config parameters validation failure: ${e.message}`;
     throw e;
   }
 }
