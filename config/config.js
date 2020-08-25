@@ -29,6 +29,7 @@ module.exports.cfg = {
   splitImages: {
     frameRate: '1',
     timeLength: 5,
+    imageExtension: 'bmp',
   },
   frameExtractionTempDir: path.join(os.tmpdir(), '/frame_extraction_storage'),
   imgNumberOcrTempDir: path.join(os.tmpdir(), '/ocr_storage'),

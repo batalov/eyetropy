@@ -58,6 +58,7 @@ async function validateConfig(config) {
         .number()
         .integer()
         .min(1),
+      imageExtension: joi.string().regex(/^jpg|bmp|png$/),
     }),
     frameExtractionTempDir: joi.string(),
     imgNumberOcrTempDir: joi.string(),

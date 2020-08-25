@@ -207,7 +207,7 @@ module.exports.measureBitplaneNoise = async (input, frameRate, timeLength) => {
 
     splitOutput.forEach(line => {
       const frame = {
-        second: Number(line.match(/(?<=pts_time:).*/gm)[0]),
+        numberOfSecond: Number(line.match(/(?<=pts_time:).*/gm)[0]),
         bitplaneNoise_O_1: Number(line.match(/(?<=bitplanenoise.0.1=).*/gm)[0]),
         bitplaneNoise_1_1: Number(line.match(/(?<=bitplanenoise.1.1=).*/gm)[0]),
         bitplaneNoise_2_1: Number(line.match(/(?<=bitplanenoise.2.1=).*/gm)[0]),
@@ -291,11 +291,11 @@ module.exports.measureEntropy = async (input, frameRate, timeLength) => {
   }
 };
 
-module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength) => {
+module.exports.splitVideoIntoJpgImages = async (input, frameRate, timeLength, imageExtension) => {
   const splitImageLogLabel = cfg.logLabel.splitImage;
   try {
     const timeArg = formatTimeArg(timeLength);
-    const tmpThumbTemplate = path.join(cfg.frameExtractionTempDir, 'thumb%04d.jpg');
+    const tmpThumbTemplate = path.join(cfg.frameExtractionTempDir, `thumb%04d.${imageExtension}`);
     log.info(
       `${splitImageLogLabel}: splitting ${input} into jpeg files with ${frameRate} frame rate for ${timeLength} second period`,
     );

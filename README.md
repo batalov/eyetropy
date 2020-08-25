@@ -20,6 +20,7 @@ In order to be able to fully use eyetropy you'll need the following utilities in
 * ffmpeg
 * Tesseract
 * GraphicsMagick
+* node package @tensorflow/tfjs-node
 
 ### FFMPEG
 * Installation guides https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg    
@@ -32,8 +33,15 @@ https://github.com/tesseract-ocr/tesseract#installing-tesseract
 ### GraphicsMagick
 https://github.com/aheckmann/gm#getting-started
 
+### @tensorflow/tfjs-node
+```
+npm install @tensorflow/tfjs-node
+```
+
 ## Eyetropy Installation
-```npm install eyetropy```
+```
+npm install eyetropy
+```
 
 ## The Idea
 The whole concept of this package is to provide decent metrics (from simple meta data to more 
@@ -226,15 +234,15 @@ ffmpeg -i you_file.mp4 -vf "drawbox=x=0:y=690:w=70:h=100:color=white:t=fill","dr
 ``` 
 * Frame extraction starting from zero
 ```bash
-ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner ./your_directory/img/thumb%04d.jpg
+ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner ./your_directory/img/thumb%04d.bmp
 ```
 * One of the most straightforward ways to ensure your video is working as expected is 
 to diff extracted frames to previously prepared ones
 * In order to be able to use diff image feature you would also need to set directory with
 prepared images in the config and label each image with a corresponding number in the file name
- e.g. "thumb_0.jpg", "thumb0.jpg", "0.jpg". Diff feature expects that file name corresponds
- the number label on the image itself 
-* In terms of interpretation of VMAF Motion Average score i would recommend reading related 
+ e.g. "thumb_0.bmp", "thumb0.bmp", "0.bmp". Diff feature expects that file name corresponds
+ the number label on the image itself; note that jpeg image format may not be suitable for image extraction due to compression
+* In terms of interpretation of VMAF Motion Average score I would recommend reading related 
 articles in the Additional Information
 * Entropy metric is quite reliable in detecting how much information is on the video, but 
 the thing to consider is that it will still calculate high value for white noise

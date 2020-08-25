@@ -1,15 +1,19 @@
-const { cfg } = require('./config/config');
-const validateConfig = require('./src/configValidator');
-const validateOptions = require('./src/optionsValidator');
-const tf = require('./src/tensorFlow');
 const log = require('loglevel');
 const fs = require('fs');
 const graphicsMagick = require('gm');
-const promise = require('bluebird');
+const bluebird = require('bluebird');
 const vibrant = require('node-vibrant');
+const path = require('path');
+
+const tf = require('./src/tensorFlow');
+
+const validateConfig = require('./src/configValidator');
+const validateOptions = require('./src/optionsValidator');
+
 const { evaluateEntropy } = require('./src/imageEntropy');
 const { diffImg, findImageByFrameNumber } = require('./src/imgDiff');
-const path = require('path');
+
+const { cfg } = require('./config/config');
 
 const { makeDir, cleanUpDir, setLogLevel, removeDir } = require('./src/utils');
 
@@ -93,7 +97,7 @@ async function launch(input, options, config) {
     methods[7] = handleFrameExtraction(input, options, config);
   }
 
-  const output = await Promise.all(methods);
+  const output = await bluebird.Promise.all(methods);
 
   const results = {};
   output.forEach((value, index) => {
@@ -134,7 +138,12 @@ async function handleFrameExtraction(input, options, config) {
   } else {
     await makeDir(config.frameExtractionTempDir);
   }
-  await splitVideoIntoJpgImages(input, config.splitImages.frameRate, config.splitImages.timeLength);
+  await splitVideoIntoJpgImages(
+    input,
+    config.splitImages.frameRate,
+    config.splitImages.timeLength,
+    config.splitImages.imageExtension,
+  );
 
   if (fs.existsSync(config.imgNumberOcrTempDir)) {
     await cleanUpDir(config.imgNumberOcrTempDir);
@@ -150,7 +159,7 @@ async function handleFrameExtraction(input, options, config) {
 
   const files = fs.readdirSync(config.frameExtractionTempDir);
 
-  const results = await Promise.all(
+  const results = await bluebird.Promise.all(
     files.map(async img => {
       const imgPath = path.join(config.frameExtractionTempDir, img);
       const frameOperations = Array(6).fill('init');
@@ -189,7 +198,7 @@ async function handleFrameExtraction(input, options, config) {
       }
 
       if (options.extractFrames.imgMetaData) {
-        const gm = promise.promisifyAll(graphicsMagick(imgPath));
+        const gm = bluebird.promisifyAll(graphicsMagick(imgPath));
         frameOperations[3] = gm.identifyAsync();
       }
 
@@ -201,7 +210,7 @@ async function handleFrameExtraction(input, options, config) {
         frameOperations[5] = evaluateEntropy(imgPath);
       }
 
-      const output = await Promise.all(frameOperations);
+      const output = await bluebird.Promise.all(frameOperations);
 
       const frameData = {};
       output.forEach((value, index) => {
