@@ -30,7 +30,7 @@ module.exports.diffImg = (path1, path2, options) => {
 
 module.exports.findImageByFrameNumber = async (dir, frameNumber) => {
   try {
-    log.info(`${imgDiffLogLabel}: sitart searching for image in ${dir} by frame number ${frameNumber}`);
+    log.info(`${imgDiffLogLabel}: start searching for image in ${dir} by frame number ${frameNumber}`);
     const files = await readdir(dir);
     const result = files.find(element => {
       if (element.includes(frameNumber)) {

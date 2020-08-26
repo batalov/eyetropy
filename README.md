@@ -196,14 +196,14 @@ ffmpeg -i you_file.mp4 -vf "drawbox=x=0:y=690:w=70:h=100:color=white:t=fill","dr
 ``` 
 * Frame extraction starting from zero
 ```bash
-ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner ./your_directory/img/thumb%04d.bmp
+ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner ./your_directory/img/thumb%04d.png
 ```
 * One of the most straightforward ways to ensure your video is working as expected is 
 to diff extracted frames to previously prepared ones
 * In order to be able to use diff image feature you would also need to set directory with
 prepared images in the config and label each image with a corresponding number in the file name
- e.g. "thumb_0.bmp", "thumb0.bmp", "0.bmp". Diff feature expects that file name corresponds
- the number label on the image itself; note that jpeg image format may not be suitable for image extraction due to compression
+ e.g. "thumb_0.png", "thumb0.png", "0.png". Diff feature expects that file name corresponds
+ the number label on the image itself; note that png image format may not be suitable for image extraction due to compression
 * In terms of interpretation of VMAF Motion Average score I would recommend reading related 
 articles in the Additional Information
 * Entropy metric is quite reliable in detecting how much information is on the video, but 

@@ -7,7 +7,7 @@ module.exports.cfg = {
     model: 'mobilenet',
   },
   splitImages: {
-    imageExtension: 'bmp',
+    imageExtension: 'png',
   },
   frameExtractionTempDir: path.join(os.tmpdir(), '/frame_extraction_storage'),
   imgNumberOcrTempDir: path.join(os.tmpdir(), '/ocr_storage'),

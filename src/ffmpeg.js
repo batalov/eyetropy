@@ -300,7 +300,7 @@ module.exports.splitVideoIntoImages = async (input, options) => {
     const frameRateLog = options.frameRate ? `with ${options.frameRate} frame rate ` : '';
 
     log.info(
-      `${splitImageLogLabel}: splitting ${input} into jpeg files ${frameRateLog}for ${options.timeLength} second period`,
+      `${splitImageLogLabel}: splitting ${input} into ${options.imageExtension} files ${frameRateLog}for ${options.timeLength} second period`,
     );
 
     const frameRate = options.frameRate ? `-vf fps=${options.frameRate}` : '';

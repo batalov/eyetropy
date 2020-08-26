@@ -148,12 +148,12 @@ async function handleFrameExtraction(input, options, config) {
   }
 
   const splitImageOptions = {
-    timeLength: config.splitImages.timeLength,
+    timeLength: config.timeLength,
     imageExtension: config.splitImages.imageExtension,
   };
 
-  if (config.splitImages.frameRate) {
-    splitImageOptions.frameRate = config.splitImages.frameRate;
+  if (config.frameRate) {
+    splitImageOptions.frameRate = config.frameRate;
   }
 
   await splitVideoIntoImages(input, splitImageOptions);
