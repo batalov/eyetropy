@@ -68,13 +68,13 @@ For video labelling see https://github.com/batalov/misc
 
 ## Basic Usage
 ```js
-    const {eyetropy} = require('eyetropy');
+    const { eyetropy } = require('eyetropy');
     
     // get meta data for input source of rtsp stream
     eyetropy('rtsp://your-value/');
     
     //get meta data and VMAF Motion Average for input source of a .mp4 file
-    eyetropy('/Users/yourUser/Documents/test.mp4', {vmafMotionAvg: true, metaData: true});
+    eyetropy('/Users/yourUser/Documents/test.mp4', { vmafMotionAvg: true, metaData: true });
     
     /* get meta data, VMAF Motion Average, detect black/freeze/silent periods,
      * measure bitplane noise/entropy, extract frames for 5 second time period,
@@ -86,7 +86,7 @@ For video labelling see https://github.com/batalov/misc
      * for the video segmenting
      */ 
     eyetropy('https://coolcam.probably/hls/camera12_2.m3u8',
-    {extractFrames: {
+    { extractFrames: {
                     classifyObjects: true,
                     imgMetaData: true,
                     diffImg: true,
@@ -101,10 +101,8 @@ For video labelling see https://github.com/batalov/misc
                 measureEntropy: true,
                 measureBitplaneNoise: true,
             }, {
-                splitImages: {
-                    frameRate: '1',
-                    timeLength: 5
-                },
+                frameRate: '1',
+                timeLength: 5,
                 imgDiff: {
                     originalImageDir: '/Users/usr/img', 
                 },
@@ -122,27 +120,7 @@ For video labelling see https://github.com/batalov/misc
                 tensorFlow: {
                     numberOfChannels: 3,
                     model: 'mobilenet'
-                },
-                vmafMotionAvg: {
-                    timeLength: 5
-                },
-                detectBlackness: {
-                    timeLength: 5
-                },
-                detectFreezes: {
-                    timeLength: 5
-                },
-                detectSilentParts: {
-                    timeLength: 5
-                },
-                entropy: {
-                    frameRate: '25',
-                    timeLength: 5
-                },
-                bitplaneNoise: {
-                    frameRate: '25',
-                    timeLength: 5
-                },
+                }
             },
     'info');
 ```
@@ -161,26 +139,10 @@ https://gist.github.com/batalov/7a4da6d2e24fdf91a4bcfba594b8dbc5
 #### tensorFlow
 * numberOfChannels - number of colour channels (default 3)
 * model - tensorFlow model: either coco ssd or mobilenet (default mobilenet) 
-#### vmafMotionAvg
-* timeLength - number of seconds during which VMAF Motion Avg will be evaluated (default 5)
-#### detectBlackness
-* timeLength - number of seconds during which black parts will be detected (default 5)
-#### detectFreezes
-* timeLength - number of seconds during which freeze parts will be detected (default 5)
-#### detectSilentParts
-* timeLength - number of seconds during which silent parts will be detected (default 5)
-#### entropy
-* frameRate - number of fps (frame per second) for video (default 1); to change frame rate
-for special case use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds 
-* timeLength - number of seconds during which greyscale entropy will be evaluated (default 5)
-#### bitplaneNoise
-* frameRate - number of fps (frame per second) for video (default 1); to change frame rate
-for special case use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds 
-* timeLength - number of seconds during which bit plane noise will be evaluated (default 5)
-#### splitImages
-* frameRate - number of fps (frame per second) for video (default 1); to change frame rate
-for special case use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds 
-* timeLength - number of seconds during which video will be split into images (default 5)
+#### frameRate
+* number of fps (frame per second) for video source, use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds
+#### timeLength
+* number of seconds during which video source will be processed by eyetropy
 #### frameExtractionTempDir
 * directory for frame extraction
 #### imgNumberOcrTempDir

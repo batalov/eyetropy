@@ -20,7 +20,7 @@ const { makeDir, cleanUpDir, setLogLevel, removeDir } = require('./src/utils');
 const {
   getMetaData,
   getVmafMotionAvg,
-  splitVideoIntoJpgImages,
+  splitVideoIntoImages,
   detectBlack,
   detectFreeze,
   measureBitplaneNoise,
@@ -65,32 +65,40 @@ async function launch(input, options, config) {
     7: 'extractedFrames',
   };
 
+  const ffmpegOptions = {
+    timeLength: config.timeLength,
+  };
+
+  if (config.frameRate) {
+    ffmpegOptions.frameRate = config.frameRate;
+  }
+
   if (options.metaData) {
     methods[0] = getMetaData(input);
   }
 
   if (options.vmafMotionAvg) {
-    methods[1] = getVmafMotionAvg(input, config.vmafMotionAvg.timeLength);
+    methods[1] = getVmafMotionAvg(input, ffmpegOptions);
   }
 
   if (options.detectBlackness) {
-    methods[2] = detectBlack(input, config.detectBlackness.timeLength);
+    methods[2] = detectBlack(input, ffmpegOptions);
   }
 
   if (options.detectFreezes) {
-    methods[3] = detectFreeze(input, config.detectFreezes.timeLength);
+    methods[3] = detectFreeze(input, ffmpegOptions);
   }
 
   if (options.detectSilentParts) {
-    methods[4] = detectSilence(input, config.detectSilentParts.timeLength);
+    methods[4] = detectSilence(input, ffmpegOptions);
   }
 
   if (options.measureBitplaneNoise) {
-    methods[5] = measureBitplaneNoise(input, config.bitplaneNoise.frameRate, config.bitplaneNoise.timeLength);
+    methods[5] = measureBitplaneNoise(input, ffmpegOptions);
   }
 
   if (options.measureEntropy) {
-    methods[6] = measureEntropy(input, config.entropy.frameRate, config.entropy.timeLength);
+    methods[6] = measureEntropy(input, ffmpegOptions);
   }
 
   if (options.extractFrames) {
@@ -138,12 +146,17 @@ async function handleFrameExtraction(input, options, config) {
   } else {
     await makeDir(config.frameExtractionTempDir);
   }
-  await splitVideoIntoJpgImages(
-    input,
-    config.splitImages.frameRate,
-    config.splitImages.timeLength,
-    config.splitImages.imageExtension,
-  );
+
+  const splitImageOptions = {
+    timeLength: config.splitImages.timeLength,
+    imageExtension: config.splitImages.imageExtension,
+  };
+
+  if (config.splitImages.frameRate) {
+    splitImageOptions.frameRate = config.splitImages.frameRate;
+  }
+
+  await splitVideoIntoImages(input, splitImageOptions);
 
   if (fs.existsSync(config.imgNumberOcrTempDir)) {
     await cleanUpDir(config.imgNumberOcrTempDir);

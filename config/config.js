@@ -6,29 +6,7 @@ module.exports.cfg = {
     numberOfChannels: 3,
     model: 'mobilenet',
   },
-  vmafMotionAvg: {
-    timeLength: 5,
-  },
-  detectBlackness: {
-    timeLength: 5,
-  },
-  detectFreezes: {
-    timeLength: 5,
-  },
-  detectSilentParts: {
-    timeLength: 5,
-  },
-  entropy: {
-    frameRate: '1',
-    timeLength: 5,
-  },
-  bitplaneNoise: {
-    frameRate: '1',
-    timeLength: 5,
-  },
   splitImages: {
-    frameRate: '1',
-    timeLength: 5,
     imageExtension: 'bmp',
   },
   frameExtractionTempDir: path.join(os.tmpdir(), '/frame_extraction_storage'),

@@ -14,50 +14,12 @@ async function validateConfig(config) {
         .min(1),
       model: joi.string().regex(/^mobilenet|coco-ssd$/),
     }),
-    vmafMotionAvg: joi.object().keys({
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
-    }),
-    detectBlackness: joi.object().keys({
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
-    }),
-    detectFreezes: joi.object().keys({
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
-    }),
-    detectSilentParts: joi.object().keys({
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
-    }),
-    entropy: joi.object().keys({
-      frameRate: joi.string().regex(/^\d{1,4}\/\d{1,4}$|^\d{1,4}$/),
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
-    }),
-    bitplaneNoise: joi.object().keys({
-      frameRate: joi.string().regex(/^\d{1,4}\/\d{1,4}$|^\d{1,4}$/),
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
-    }),
+    timeLength: joi
+      .number()
+      .integer()
+      .min(1)
+      .required(),
     splitImages: joi.object().keys({
-      frameRate: joi.string().regex(/^\d{1,4}\/\d{1,4}$|^\d{1,4}$/),
-      timeLength: joi
-        .number()
-        .integer()
-        .min(1),
       imageExtension: joi.string().regex(/^jpg|bmp|png$/),
     }),
     frameExtractionTempDir: joi.string(),
