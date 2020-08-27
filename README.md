@@ -120,7 +120,11 @@ For video labelling see https://github.com/batalov/misc
                 tensorFlow: {
                     numberOfChannels: 3,
                     model: 'mobilenet'
-                }
+                },
+                frameExtractionTempDir: '/Users/folk/Documents/frame_extraction_storage',
+                imgNumberOcrTempDir: '/Users/folk/Documents/ocr_storage',
+                cleanUpFrameExtractionTempDir: false,
+                cleanUpImgNumberOcrTempDir: false,
             },
     'info');
 ```
