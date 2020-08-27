@@ -114,11 +114,11 @@ async function launch(input, options, config) {
     }
   });
 
-  if (fs.existsSync(config.frameExtractionTempDir)) {
+  if (config.cleanUpFrameExtractionTempDir && fs.existsSync(config.frameExtractionTempDir)) {
     await removeDir(config.frameExtractionTempDir);
   }
 
-  if (fs.existsSync(config.imgNumberOcrTempDir)) {
+  if (config.cleanUpImgNumberOcrTempDir && fs.existsSync(config.imgNumberOcrTempDir)) {
     await removeDir(config.imgNumberOcrTempDir);
   }
 

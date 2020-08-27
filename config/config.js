@@ -11,6 +11,8 @@ module.exports.cfg = {
   },
   frameExtractionTempDir: path.join(os.tmpdir(), '/frame_extraction_storage'),
   imgNumberOcrTempDir: path.join(os.tmpdir(), '/ocr_storage'),
+  cleanUpFrameExtractionTempDir: true,
+  cleanUpImgNumberOcrTempDir: true,
   logLabel: {
     configValidator: '[config-validator]',
     optionsValidator: '[options-validator]',
