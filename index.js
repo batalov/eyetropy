@@ -187,7 +187,7 @@ async function handleFrameExtraction(input, options, config) {
 
       if ((options.extractFrames.classifyObjects || options.extractFrames.diffImg) && config.imgCropper) {
         frameOperations[0] = await labelImg(imgPath, config);
-        if (config.imgNumberOcr.stripNonDigits || !config.imgNumberOcr.stripNonDigits) {
+        if (config.imgNumberOcr.stripNonDigits) {
           frameOperations[0] = frameOperations[0].replace(/\D/g, '');
         }
       }

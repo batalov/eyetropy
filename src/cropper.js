@@ -15,8 +15,8 @@ module.exports.cropAndNormalizeImage = async function(input, config) {
     log.debug(`${imgCropperLogLabel}: image dimensions: ${imgMetaData.width} x ${imgMetaData.height}`);
 
     if (config.imgCropper.rectangle) {
-      config.imgCropper.width = config.imgCropper.width || Math.floor((imgMetaData.width / 100) * 7);
-      config.imgCropper.height = config.imgCropper.height || Math.floor((imgMetaData.height / 100) * 3);
+      config.imgCropper.width = config.imgCropper.rectangle.width || Math.floor((imgMetaData.width / 100) * 7);
+      config.imgCropper.height = config.imgCropper.rectangle.height || Math.floor((imgMetaData.height / 100) * 3);
       if (config.imgCropper.rectangle.type === 'top-left') {
         config.imgCropper.left = config.imgCropper.left || 0;
         config.imgCropper.top = config.imgCropper.top || 0;

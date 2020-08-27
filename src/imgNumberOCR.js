@@ -9,14 +9,6 @@ const imgOcrLogLabel = cfg.logLabel.imgOcr;
 module.exports.imgNumberOcr = async function(input, config) {
   try {
     log.info(`${imgOcrLogLabel}: start image OCR process`);
-    if (!config.imgNumberOcr) {
-      config.imgNumberOcr = {
-        stripNonDigits: true,
-        lang: 'eng',
-        oem: 1,
-        psm: 6,
-      };
-    }
 
     const results = await tesseract.recognize(path.join(config.imgNumberOcrTempDir, path.basename(input)), {
       lang: config.imgNumberOcr.lang,

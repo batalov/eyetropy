@@ -20,6 +20,9 @@ module.exports.diffImg = (path1, path2, options) => {
       }
       log.info(`${imgDiffLogLabel}: finish calculating difference between ${path1} and ${path2} images`);
       resolve({
+        firstImage: path1,
+        secondImage: path2,
+        ocrNumberImage: path.join(cfg.imgNumberOcrTempDir, path.basename(path2)),
         isEqual: isEqual,
         equality: equality,
         raw: raw,

@@ -13,6 +13,12 @@ module.exports.cfg = {
   imgNumberOcrTempDir: path.join(os.tmpdir(), '/ocr_storage'),
   cleanUpFrameExtractionTempDir: true,
   cleanUpImgNumberOcrTempDir: true,
+  imgNumberOcr: {
+    stripNonDigits: true,
+    lang: 'eng',
+    oem: 1,
+    psm: 6,
+  },
   logLabel: {
     configValidator: '[config-validator]',
     optionsValidator: '[options-validator]',
