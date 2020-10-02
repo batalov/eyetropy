@@ -25,11 +25,16 @@ module.exports.getVmafMotionAvg = async (input, options) => {
   const vmafLogLabel = cfg.logLabel.vmaf;
   try {
     log.info(`${vmafLogLabel}: start evaluating VMAF Motion Average`);
-    const timeArg = formatTimeArg(options.timeLength);
-    const { stdout, stderr } = await execute(
-      `ffmpeg ${timeArg} -i ${input} -vf vmafmotion -f null -`,
-      cfg.commandLineBuffer,
-    );
+
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
+    const ffmpegCmd = `ffmpeg ${timeArg} -i ${input} -vf vmafmotion -f null -`;
+    log.info(`Executing ffmpeg: ${ffmpegCmd}`);
+    const { stdout, stderr } = await execute(ffmpegCmd, cfg.commandLineBuffer);
     const vmafMotionAvg = Number(stderr.match(/(?<=VMAF Motion avg: ).*/gm)[0]);
     log.info(`${vmafLogLabel}: finish evaluating VMAF Motion Average`);
     log.debug(`${vmafLogLabel}: stdout output \n ${stdout}`);
@@ -46,11 +51,16 @@ module.exports.detectBlack = async (input, options) => {
   const blackDetectLogLabel = cfg.logLabel.blackDetect;
   try {
     log.info(`${blackDetectLogLabel}: start detecting black parts`);
-    const timeArg = formatTimeArg(options.timeLength);
-    const { stdout, stderr } = await execute(
-      `ffmpeg ${timeArg} -nostats -i ${input} -vf blackdetect -f null -`,
-      cfg.commandLineBuffer,
-    );
+
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
+    const ffmpegCmd = `ffmpeg ${timeArg} -nostats -i ${input} -vf blackdetect -f null -`;
+    log.info(`Executing ffmpeg: ${ffmpegCmd}`);
+    const { stdout, stderr } = await execute(ffmpegCmd, cfg.commandLineBuffer);
     log.debug(`${blackDetectLogLabel}: stdout \n ${stdout}`);
     log.debug(`${blackDetectLogLabel}: stderr \n ${stderr}`);
 
@@ -92,11 +102,16 @@ module.exports.detectFreeze = async (input, options) => {
   const freezeDetectLogLabel = cfg.logLabel.freezeDetect;
   try {
     log.info(`${freezeDetectLogLabel}: start detecting freeze parts`);
-    const timeArg = formatTimeArg(options.timeLength);
-    const { stdout, stderr } = await execute(
-      `ffmpeg ${timeArg} -nostats -i ${input} -vf freezedetect -f null -`,
-      cfg.commandLineBuffer,
-    );
+
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
+    const ffmpegCmd = `ffmpeg ${timeArg} -nostats -i ${input} -vf freezedetect -f null -`;
+    log.info(`Executing ffmpeg: ${ffmpegCmd}`);
+    const { stdout, stderr } = await execute(ffmpegCmd, cfg.commandLineBuffer);
     log.debug(`${freezeDetectLogLabel}: stdout \n ${stdout}`);
     log.debug(`${freezeDetectLogLabel}: stderr \n ${stderr}`);
 
@@ -138,11 +153,16 @@ module.exports.detectSilence = async (input, options) => {
   const silenceDetectLogLabel = cfg.logLabel.silenceDetect;
   try {
     log.info(`${silenceDetectLogLabel}: start detecting silent parts`);
-    const timeArg = formatTimeArg(options.timeLength);
-    const { stdout, stderr } = await execute(
-      `ffmpeg ${timeArg} -nostats -i ${input} -af silencedetect -f null -`,
-      cfg.commandLineBuffer,
-    );
+
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
+    const ffmpegCmd = `ffmpeg ${timeArg} -nostats -i ${input} -af silencedetect -f null -`;
+    log.info(`Executing ffmpeg: ${ffmpegCmd}`);
+    const { stdout, stderr } = await execute(ffmpegCmd, cfg.commandLineBuffer);
     log.debug(`${silenceDetectLogLabel}: stdout \n ${stdout}`);
     log.debug(`${silenceDetectLogLabel}: stderr \n ${stderr}`);
 
@@ -186,12 +206,17 @@ module.exports.measureBitplaneNoise = async (input, options) => {
   const bitplaneNoiseLogLabel = cfg.logLabel.bitplaneNoise;
   try {
     const fR = options.frameRate ? `fps=${options.frameRate},` : '';
-    const timeArg = formatTimeArg(options.timeLength);
+
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
     log.info(`${bitplaneNoiseLogLabel}: start measuring bitplane noise`);
-    const { stdout, stderr } = await execute(
-      `ffmpeg ${timeArg} -i ${input} -vf ${fR}bitplanenoise,metadata=mode=print:file=- -f null -`,
-      cfg.commandLineBuffer,
-    );
+    const ffmpegCmd = `ffmpeg ${timeArg} -i ${input} -vf ${fR}bitplanenoise,metadata=mode=print:file=- -f null -`;
+    log.info(`Executing ffmpeg: ${ffmpegCmd}`);
+    const { stdout, stderr } = await execute(ffmpegCmd, cfg.commandLineBuffer);
     log.debug(`${bitplaneNoiseLogLabel}: stdout\n ${stdout}`);
     log.debug(`${bitplaneNoiseLogLabel}: stderr\n ${stderr}`);
 
@@ -236,12 +261,17 @@ module.exports.measureEntropy = async (input, options) => {
   const entropyLogLabel = cfg.logLabel.entropy;
   try {
     const fR = options.frameRate ? `fps=${options.frameRate},` : '';
-    const timeArg = formatTimeArg(options.timeLength);
+
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
     log.info(`${entropyLogLabel}: start measuring entropy`);
-    const { stdout, stderr } = await execute(
-      `ffmpeg ${timeArg} -i ${input} -vf ${fR}entropy,metadata=mode=print:file=- -f null -`,
-      cfg.commandLineBuffer,
-    );
+    const ffmpegCmd = `ffmpeg ${timeArg} -i ${input} -vf ${fR}entropy,metadata=mode=print:file=- -f null -`;
+    log.info(`Executing ffmpeg: ${ffmpegCmd}`);
+    const { stdout, stderr } = await execute(ffmpegCmd, cfg.commandLineBuffer);
     log.debug(`${entropyLogLabel}: stdout\n ${stdout}`);
     log.debug(`${entropyLogLabel}: stderr\n ${stderr}`);
 
@@ -294,7 +324,12 @@ module.exports.measureEntropy = async (input, options) => {
 module.exports.splitVideoIntoImages = async (input, options) => {
   const splitImageLogLabel = cfg.logLabel.splitImage;
   try {
-    const timeArg = formatTimeArg(options.timeLength);
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
     const tmpThumbTemplate = path.join(cfg.frameExtractionTempDir, `thumb%04d.${options.imageExtension}`);
 
     const frameRateLog = options.frameRate ? `with ${options.frameRate} frame rate ` : '';
@@ -305,7 +340,9 @@ module.exports.splitVideoIntoImages = async (input, options) => {
 
     const frameRate = options.frameRate ? `-vf fps=${options.frameRate}` : '';
 
-    const ffmpegSplitCommand = `ffmpeg ${timeArg} -i ${input} ${frameRate}-hide_banner ${tmpThumbTemplate}`;
+    const ffmpegSplitCommand = `ffmpeg -i ${input} ${timeArg} ${frameRate}-hide_banner ${tmpThumbTemplate}`;
+
+    log.info(`Executing ffmpeg: ${ffmpegSplitCommand}`);
 
     await execute(ffmpegSplitCommand, cfg.commandLineBuffer);
   } catch (e) {

@@ -17,10 +17,9 @@ async function validateConfig(config) {
     timeLength: joi
       .number()
       .integer()
-      .min(1)
-      .required(),
+      .min(1),
     splitImages: joi.object().keys({
-      imageExtension: joi.string().regex(/^jpg|bmp|png$/),
+      imageExtension: joi.string().regex(/^png$/),
     }),
     frameExtractionTempDir: joi.string(),
     imgNumberOcrTempDir: joi.string(),
@@ -28,6 +27,9 @@ async function validateConfig(config) {
     cleanUpImgNumberOcrTempDir: joi.boolean(),
     imgCropper: joi.object().keys({
       bwThreshold: joi.number().min(0),
+      toBlackWhiteColourSpace: joi.boolean(),
+      normalizeImg: joi.boolean(),
+      sharpenImg: joi.boolean(),
       rectangle: joi.object().keys({
         type: joi
           .string()

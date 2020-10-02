@@ -53,6 +53,16 @@ async function launch(input, options, config) {
     return { metaData: await getMetaData(input) };
   }
 
+  if (config.imgDiff) {
+    if (!config.imgDiff.originalImageDir) {
+      throw Error('Missing config.imgDiff.originalImageDir param');
+    }
+    const imgDiffOriginalImageDirExists = fs.existsSync(config.imgDiff.originalImageDir);
+    if (!imgDiffOriginalImageDirExists) {
+      throw Error('Provided config.imgDiff.originalImageDir path does not exist');
+    }
+  }
+
   const methods = Array(8).fill('init');
   const propertyNameDict = {
     0: 'metaData',
@@ -65,9 +75,11 @@ async function launch(input, options, config) {
     7: 'extractedFrames',
   };
 
-  const ffmpegOptions = {
-    timeLength: config.timeLength,
-  };
+  const ffmpegOptions = {};
+
+  if (config.timeLength) {
+    ffmpegOptions.timeLength = config.timeLength;
+  }
 
   if (config.frameRate) {
     ffmpegOptions.frameRate = config.frameRate;
@@ -148,9 +160,12 @@ async function handleFrameExtraction(input, options, config) {
   }
 
   const splitImageOptions = {
-    timeLength: config.timeLength,
     imageExtension: config.splitImages.imageExtension,
   };
+
+  if (config.timeLength) {
+    splitImageOptions.timeLength = config.timeLength;
+  }
 
   if (config.frameRate) {
     splitImageOptions.frameRate = config.frameRate;
@@ -183,12 +198,13 @@ async function handleFrameExtraction(input, options, config) {
         3: 'imgMetaData',
         4: 'imgDominantColours',
         5: 'imgEntropy',
+        6: 'frameOcrRawResults',
       };
 
       if ((options.extractFrames.classifyObjects || options.extractFrames.diffImg) && config.imgCropper) {
-        frameOperations[0] = await labelImg(imgPath, config);
+        frameOperations[6] = await labelImg(imgPath, config);
         if (config.imgNumberOcr.stripNonDigits) {
-          frameOperations[0] = frameOperations[0].replace(/\D/g, '');
+          frameOperations[0] = frameOperations[6].replace(/\D/g, '');
         }
       }
 

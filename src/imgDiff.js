@@ -23,7 +23,6 @@ module.exports.diffImg = (path1, path2, options) => {
         firstImage: path1,
         secondImage: path2,
         ocrNumberImage: path.join(cfg.imgNumberOcrTempDir, path.basename(path2)),
-        isEqual: isEqual,
         equality: equality,
         raw: raw,
       });
@@ -40,7 +39,7 @@ module.exports.findImageByFrameNumber = async (dir, frameNumber) => {
         return element;
       }
     });
-    log.info(`${imgDiffLogLabel}: finish search for image by frame number`);
+    log.info(`${imgDiffLogLabel}: finish search for image by frame number ${frameNumber}`);
     if (typeof result === 'undefined') {
       log.info(`${imgDiffLogLabel}: no image path was found for ${dir} dir with ${frameNumber} frame number`);
       return null;

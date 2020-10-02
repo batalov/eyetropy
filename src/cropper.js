@@ -6,10 +6,7 @@ const imgCropperLogLabel = cfg.logLabel.imgCropper;
 
 module.exports.cropAndNormalizeImage = async function(input, config) {
   try {
-    log.info(
-      `${imgCropperLogLabel}: start reading, b-w normalizing, cropping ` +
-        `buffer with ${config.imgCropper.bwThreshold} threshold`,
-    );
+    log.info(`${imgCropperLogLabel}: start reading and cropping `);
 
     const imgMetaData = await sharp(input).metadata();
     log.debug(`${imgCropperLogLabel}: image dimensions: ${imgMetaData.width} x ${imgMetaData.height}`);
@@ -35,7 +32,7 @@ module.exports.cropAndNormalizeImage = async function(input, config) {
       }
     }
 
-    log.debug(`${imgCropperLogLabel}: rectangle dimensions: ${JSON.stringify(config.imgCropper)}`);
+    log.debug(`${imgCropperLogLabel}: rectangle properties: ${JSON.stringify(config.imgCropper)}`);
 
     let buf = await sharp(input)
       .extract({
@@ -44,29 +41,40 @@ module.exports.cropAndNormalizeImage = async function(input, config) {
         left: config.imgCropper.left,
         top: config.imgCropper.top,
       })
-      .normalize()
-      .toColourspace('b-w')
-      .sharpen()
       .toBuffer();
 
-    const imgPath = path.join(config.imgNumberOcrTempDir, path.basename(input));
+    if (config.imgCropper.normalizeImg) {
+      log.info(`${imgCropperLogLabel}: apply image normalization`);
+      buf = await sharp(buf)
+        .normalize()
+        .toBuffer();
+    }
+
+    if (config.imgCropper.toBlackWhiteColourSpace) {
+      log.info(`${imgCropperLogLabel}: convert to black-white colour space`);
+      buf = await sharp(buf)
+        .toColourspace('b-w')
+        .toBuffer();
+    }
+
+    if (config.imgCropper.sharpenImg) {
+      log.info(`${imgCropperLogLabel}: apply sharpening to image`);
+      buf = await sharp(buf)
+        .sharpen()
+        .toBuffer();
+    }
 
     if (config.imgCropper.bwThreshold) {
+      log.info(`${imgCropperLogLabel}: apply ${config.imgCropper.bwThreshold} black-white threshold`);
       buf = await sharp(buf)
         .threshold(config.imgCropper.bwThreshold)
         .toBuffer();
     }
 
-    log.info(`${imgCropperLogLabel}: write to file`);
-    await sharp(buf)
-      .extend({
-        left: 0,
-        bottom: 0,
-        right: config.imgCropper.width * 3,
-        top: config.imgCropper.height * 3,
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
-      })
-      .toFile(imgPath);
+    const imgPath = path.join(config.imgNumberOcrTempDir, path.basename(input));
+
+    log.info(`${imgCropperLogLabel}: write to file ${imgPath}`);
+    await sharp(buf).toFile(imgPath);
 
     log.info(`${imgCropperLogLabel}: finish cropping image`);
   } catch (e) {

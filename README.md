@@ -20,6 +20,7 @@ In order to be able to fully use eyetropy you'll need the following utilities in
 * ffmpeg
 * Tesseract
 * GraphicsMagick
+* sharp
 * node package @tensorflow/tfjs-node
 
 ### FFMPEG
@@ -32,6 +33,9 @@ https://github.com/tesseract-ocr/tesseract#installing-tesseract
 
 ### GraphicsMagick
 https://github.com/aheckmann/gm#getting-started
+
+### Sharp
+https://sharp.pixelplumbing.com/
 
 ### @tensorflow/tfjs-node
 ```
@@ -155,8 +159,14 @@ prepared images
 #### imgCropper
 * configuration for cropping and image normalization process; used to crop, resize, normalize
 image for further number ocr process
+##### normalizeImg
+* used for image normalization https://sharp.pixelplumbing.com/api-operation#normalise
+##### toBlackWhiteColourSpace
+* used to transform image colour space to black-white https://sharp.pixelplumbing.com/api-colour#tocolourspace
+##### sharpenImg
+* used to sharpen image https://sharp.pixelplumbing.com/api-operation#sharpen
 ##### bwThreshold
-* used to transform image to b-w colours http://sharp.pixelplumbing.com/en/stable/api-operation/#threshold
+* used to transform image to b-w colours https://sharp.pixelplumbing.com/api-operation#threshold
 ##### rectangle
 Sets the cropping rectangle. Can be set to one of: top-left, bottom-left, bottom-right, top-right, custom; 
 custom allows you set the dimensions of rectangle manually.
@@ -189,14 +199,34 @@ Configures Tesseract OCR Engine
 ##### originalImageDir
 * Sets the directory with images to diff with
 
+## Interpreting diff results
+The main metric for diff images functionality is equality. Zero value means total equality. While values likes 0.1 or 0.5
+can be interpreted as less equality between two images (0.1 being more equal than 0.5).
+
+```{
+    "extractedFrames": [
+     {
+      "frameOcrNumber": "414",
+      "diffResults": {
+       "firstImage": "/some/path/thumb0414.png",
+       "secondImage": "/some/path/thumb0001.png",
+       "ocrNumberImage": "/some/path/thumb0001.png",
+       "equality": 0, 
+       "raw": "Image Difference (MeanSquaredError):\n           Normalized    Absolute\n          ============  ==========\n     Red: 0.0000000000        0.0\n   Green: 0.0000000000        0.0\n    Blue: 0.0000000000        0.0\n   Total: 0.0000000000        0.0\n"
+      },
+      "frameOcrRawResults": "414\n\f"
+     }
+    }
+```
+
 ## General Notes
 * If your goal is testing some web service with video processing, the best practice 
 would be to prepare video file (to use it as a stream later) with known expected 
 test values. In my case image preparation included the following: i labeled each frame 
 with a white rectangle, containing number of frame and then extracted frames with ffmpeg
-* Frame labelling using ffmpeg
+* Frame labelling using ffmpeg for 1920x1080 video
 ```bash
-ffmpeg -i you_file.mp4 -vf "drawbox=x=0:y=690:w=70:h=100:color=white:t=fill","drawtext=fontfile=/path_to_font_directory/Arial.ttf:text=%{n}:fontcolor=black@1: x=5: y=700" output.mp4
+ffmpeg -i you_file.mp4 -vf "drawbox=x=0:y=1030:w=80:h=350:color=white:t=fill","drawtext=fontfile=/path_to_font_directory/Roboto-Medium.ttf:text=%{n}:fontcolor=black@1: x=20: y=1050:fontsize=20" output.mp4
 ``` 
 * Frame extraction starting from zero
 ```bash
@@ -231,4 +261,3 @@ https://medium.com/netflix-techblog/vmaf-the-journey-continues-44b51ee9ed12
 * Webdriver io implementation of screen capture of certain html element using ffmpeg
 https://gist.github.com/batalov/3d465a9480a004acfb461648164f3e80 
 * Video labelling examples https://github.com/batalov/misc
-
