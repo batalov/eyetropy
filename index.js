@@ -5,8 +5,6 @@ const bluebird = require('bluebird');
 const vibrant = require('node-vibrant');
 const path = require('path');
 
-const tf = require('./src/tensorFlow');
-
 const validateConfig = require('./src/configValidator');
 const validateOptions = require('./src/optionsValidator');
 
@@ -215,6 +213,7 @@ async function handleFrameExtraction(input, options, config) {
       }
 
       if (options.extractFrames.classifyObjects) {
+        const tf = require('./src/tensorFlow');
         frameOperations[1] = tf.classify(imgPath, config);
       }
 
