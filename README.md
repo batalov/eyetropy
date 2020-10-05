@@ -104,6 +104,7 @@ For video labelling see https://github.com/batalov/misc
                 detectSilentParts: true,
                 measureEntropy: true,
                 measureBitplaneNoise: true,
+                recordVideo: true,
             }, {
                 frameRate: '1',
                 timeLength: 5,
@@ -127,6 +128,7 @@ For video labelling see https://github.com/batalov/misc
                 },
                 frameExtractionTempDir: '/Users/folk/Documents/frame_extraction_storage',
                 imgNumberOcrTempDir: '/Users/folk/Documents/ocr_storage',
+                recordVideoTempDir: '/Users/folk/Documents/recorded_video',
                 cleanUpFrameExtractionTempDir: false,
                 cleanUpImgNumberOcrTempDir: false,
             },
@@ -153,6 +155,8 @@ https://gist.github.com/batalov/7a4da6d2e24fdf91a4bcfba594b8dbc5
 * number of seconds during which video source will be processed by eyetropy
 #### frameExtractionTempDir
 * directory for frame extraction
+#### recordVideoTempDir
+* directory to save recorded from source video
 #### imgNumberOcrTempDir
 * directory for img ocr process; used for image ocr for further mapping of extracted and
 prepared images
