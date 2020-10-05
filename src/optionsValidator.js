@@ -21,6 +21,7 @@ async function validateOptions(options) {
     detectSilentParts: joi.boolean().valid(true),
     measureBitplaneNoise: joi.boolean().valid(true),
     measureEntropy: joi.boolean().valid(true),
+    recordVideo: joi.boolean().valid(true),
   });
 
   try {

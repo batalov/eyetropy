@@ -351,6 +351,36 @@ module.exports.splitVideoIntoImages = async (input, options) => {
   }
 };
 
+module.exports.recordVideo = async (input, options) => {
+  const recordVideoLabel = cfg.logLabel.recordVideo;
+  try {
+    let timeArg = '';
+
+    if (options.timeLength) {
+      timeArg = formatTimeArg(options.timeLength);
+    }
+
+    const output = path.join(cfg.recordVideoTempDir, `eyetropy_recorded_video_${Date.now()}.mp4`);
+
+    log.info(
+      `${recordVideoLabel}: recording ${input} into ${cfg.recordVideoTempDir} for ${options.timeLength} second period`,
+    );
+
+    const ffmpegRecordVideoCommand = `ffmpeg -i ${input} ${timeArg} -c copy ${output}`;
+
+    log.info(`Executing ffmpeg: ${ffmpegRecordVideoCommand}`);
+
+    await execute(ffmpegRecordVideoCommand, cfg.commandLineBuffer);
+
+    log.info(`Successfully recorded ${input} as ${output}`);
+
+    return { source: input, savedVideo: output };
+  } catch (e) {
+    e.message = `${recordVideoLabel}: error recording video \n${e.message}`;
+    throw e;
+  }
+};
+
 function formatTimeArg(timeLength) {
   return `-t ${new Date(timeLength * 1000).toISOString().substr(11, 8)}`;
 }

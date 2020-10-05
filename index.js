@@ -26,6 +26,7 @@ const {
   measureBitplaneNoise,
   detectSilence,
   measureEntropy,
+  recordVideo,
 } = require('./src/ffmpeg');
 
 const { cropAndNormalizeImage } = require('./src/cropper');
@@ -73,6 +74,7 @@ async function launch(input, options, config) {
     5: 'bitplaneNoise',
     6: 'entropy',
     7: 'extractedFrames',
+    8: 'recordVideo',
   };
 
   const ffmpegOptions = {};
@@ -115,6 +117,10 @@ async function launch(input, options, config) {
 
   if (options.extractFrames) {
     methods[7] = handleFrameExtraction(input, options, config);
+  }
+
+  if (options.recordVideo) {
+    methods[8] = recordVideo(input, ffmpegOptions);
   }
 
   const output = await bluebird.Promise.all(methods);

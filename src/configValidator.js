@@ -23,6 +23,7 @@ async function validateConfig(config) {
     }),
     frameExtractionTempDir: joi.string(),
     imgNumberOcrTempDir: joi.string(),
+    recordVideoTempDir: joi.string(),
     cleanUpFrameExtractionTempDir: joi.boolean(),
     cleanUpImgNumberOcrTempDir: joi.boolean(),
     imgCropper: joi.object().keys({
