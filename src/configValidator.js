@@ -19,7 +19,12 @@ async function validateConfig(config) {
       .integer()
       .min(1),
     splitImages: joi.object().keys({
-      imageExtension: joi.string().regex(/^png$/),
+      imageExtension: joi.string().regex(/^png|jpg$/),
+      jpegQuality: joi
+        .number()
+        .integer()
+        .min(1)
+        .max(31),
     }),
     frameExtractionTempDir: joi.string(),
     imgNumberOcrTempDir: joi.string(),

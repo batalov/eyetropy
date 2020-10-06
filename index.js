@@ -15,6 +15,8 @@ const { cfg } = require('./config/config');
 
 const { makeDir, cleanUpDir, setLogLevel, removeDir } = require('./src/utils');
 
+let tf;
+
 const {
   getMetaData,
   getVmafMotionAvg,
@@ -35,7 +37,7 @@ const eyetropy = async function(input, options, config, logLevel) {
     setLogLevel(logLevel);
     await validateOptions(options);
     await validateConfig(config);
-    const conf = await prepareConfig(config);
+    const conf = prepareConfig(config);
 
     const results = await launch(input, options, conf);
 
@@ -75,42 +77,32 @@ async function launch(input, options, config) {
     8: 'recordVideo',
   };
 
-  const ffmpegOptions = {};
-
-  if (config.timeLength) {
-    ffmpegOptions.timeLength = config.timeLength;
-  }
-
-  if (config.frameRate) {
-    ffmpegOptions.frameRate = config.frameRate;
-  }
-
   if (options.metaData) {
     methods[0] = getMetaData(input);
   }
 
   if (options.vmafMotionAvg) {
-    methods[1] = getVmafMotionAvg(input, ffmpegOptions);
+    methods[1] = getVmafMotionAvg(input, config);
   }
 
   if (options.detectBlackness) {
-    methods[2] = detectBlack(input, ffmpegOptions);
+    methods[2] = detectBlack(input, config);
   }
 
   if (options.detectFreezes) {
-    methods[3] = detectFreeze(input, ffmpegOptions);
+    methods[3] = detectFreeze(input, config);
   }
 
   if (options.detectSilentParts) {
-    methods[4] = detectSilence(input, ffmpegOptions);
+    methods[4] = detectSilence(input, config);
   }
 
   if (options.measureBitplaneNoise) {
-    methods[5] = measureBitplaneNoise(input, ffmpegOptions);
+    methods[5] = measureBitplaneNoise(input, config);
   }
 
   if (options.measureEntropy) {
-    methods[6] = measureEntropy(input, ffmpegOptions);
+    methods[6] = measureEntropy(input, config);
   }
 
   if (options.extractFrames) {
@@ -118,7 +110,7 @@ async function launch(input, options, config) {
   }
 
   if (options.recordVideo) {
-    methods[8] = recordVideo(input, ffmpegOptions);
+    methods[8] = recordVideo(input, config);
   }
 
   const output = await bluebird.Promise.all(methods);
@@ -141,11 +133,13 @@ async function launch(input, options, config) {
   return results;
 }
 
-async function prepareConfig(config) {
+function prepareConfig(config) {
   const output = cfg;
   if (config && config.constructor === Object && Object.entries(config).length > 0) {
     for (const key in config) {
-      if (config.hasOwnProperty(key)) output[key] = config[key];
+      if (config.hasOwnProperty(key)) {
+        output[key] = config[key];
+      }
     }
   }
   return output;
@@ -157,25 +151,13 @@ async function labelImg(input, config) {
 }
 
 async function handleFrameExtraction(input, options, config) {
-  if (fs.existsSync(config.frameExtractionTempDir)) {
+  if (fs.existsSync(config.frameExtractionTempDir) && fs.readdirSync(config.frameExtractionTempDir).length !== 0) {
     await cleanUpDir(config.frameExtractionTempDir);
   } else {
     await makeDir(config.frameExtractionTempDir);
   }
 
-  const splitImageOptions = {
-    imageExtension: config.splitImages.imageExtension,
-  };
-
-  if (config.timeLength) {
-    splitImageOptions.timeLength = config.timeLength;
-  }
-
-  if (config.frameRate) {
-    splitImageOptions.frameRate = config.frameRate;
-  }
-
-  await splitVideoIntoImages(input, splitImageOptions);
+  await splitVideoIntoImages(input, config);
 
   if (fs.existsSync(config.imgNumberOcrTempDir)) {
     await cleanUpDir(config.imgNumberOcrTempDir);
@@ -186,6 +168,7 @@ async function handleFrameExtraction(input, options, config) {
   }
 
   if (options.extractFrames.classifyObjects) {
+    tf = require('./src/tensorFlow');
     await tf.load(config);
   }
 
@@ -213,7 +196,6 @@ async function handleFrameExtraction(input, options, config) {
       }
 
       if (options.extractFrames.classifyObjects) {
-        const tf = require('./src/tensorFlow');
         frameOperations[1] = tf.classify(imgPath, config);
       }
 

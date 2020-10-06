@@ -236,6 +236,10 @@ ffmpeg -i you_file.mp4 -vf "drawbox=x=0:y=1030:w=80:h=350:color=white:t=fill","d
 ```bash
 ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner ./your_directory/img/thumb%04d.png
 ```
+or
+```bash
+ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner -qscale 1 ./your_directory/img/thumb%04d.jpg
+```
 * One of the most straightforward ways to ensure your video is working as expected is 
 to diff extracted frames to previously prepared ones
 * In order to be able to use diff image feature you would also need to set directory with
