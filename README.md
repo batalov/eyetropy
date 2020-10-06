@@ -253,7 +253,7 @@ the thing to consider is that it will still calculate high value for white noise
 * Bitplane noise metric can be quite useful for noise detection or to get the colour info
 * The input (file/stream uri, options/config/logLevel params) to this module gets through 
 a strict validation process
-* Bare in mind that increasing values of frame rate and time length properties also increase 
+* Bear in mind that increasing values of frame rate and time length properties also increase 
 the overall time required for execution
 
 ## Additional Information
