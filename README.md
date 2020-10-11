@@ -1,9 +1,9 @@
 # eyetropy
-This package is aimed at testing (web) video services. 
-You can get lots of data regarding video file or stream such as:
+This package aimed at testing (web) video services. 
+You can get lots of data regarding a video file or stream such as:
 
 * Basic meta data like codec name/format, video resolution/aspect ratio etc.
-* VMAF Motion Average value, which describes how much motion is present in the video 
+* VMAF Motion Average value, which describes how much motion is present in the video content
 and the video quality as perceived by human
 * Video fragments containing black parts
 * Video fragments containing freezes
@@ -51,10 +51,10 @@ npm install eyetropy
 The whole concept of this package is to provide decent metrics (from simple meta data to more 
 complex ones) for testing video files or streams. You can use the VMAF Motion Average 
 value to identify how much motion happens on the video as well as the perceived quality of it.
-Additionally you can detect silence, black/freeze parts on your input file/stream. Besides, 
+Additionally, you can detect silence, black/freeze parts on your input file/stream. Besides, 
 with entropy value you can get an amount of information on the input and with bitplane noise 
-measurement detect the bitplane noise. Additionaly, it is possible to extract frames
-and get per frame meta data, dominant colours, greyscale entropy or to diff frame to 
+measurement detect the bitplane noise. Additionally, it is possible to extract frames
+and get per frame metadata, dominant colours, greyscale entropy or to diff frame to 
 images prepared beforehand; combined with the machine learning algorithm, which identifies 
 objects on each video frame, you can have a comprehensive combination of means to measure if 
 your video file or stream is working as expected with no black screen/noise, 
@@ -65,7 +65,7 @@ Say you need to test a video streaming web service, more specifically your goal 
 automate testing process. The general algorithm would be to grab a piece of video -> label
 each frame (draw a frame number on each frame) -> extract frames (to later use as diff images) -> 
 run labelled video through the video service -> grab a video fragment after it's been 
-processed by the service -> compare to expected values (meta data, entropy and so forth) 
+processed by the service -> compare to expected values (metadata, entropy and so forth) 
 or diff to beforehand prepared images using this module.
 
 For video labelling see https://github.com/batalov/misc
@@ -150,7 +150,7 @@ https://gist.github.com/batalov/7a4da6d2e24fdf91a4bcfba594b8dbc5
 * numberOfChannels - number of colour channels (default 3)
 * model - tensorFlow model: either coco ssd or mobilenet (default mobilenet) 
 #### frameRate
-* number of fps (frame per second) for video source, use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds
+* number of fps (frame per second) for the video source, use string format f/s e.g. '1/5' to extract 1 frame each 5 seconds
 #### timeLength
 * number of seconds during which video source will be processed by eyetropy
 #### frameExtractionTempDir
@@ -160,6 +160,8 @@ https://gist.github.com/batalov/7a4da6d2e24fdf91a4bcfba594b8dbc5
 #### imgNumberOcrTempDir
 * directory for img ocr process; used for image ocr for further mapping of extracted and
 prepared images
+#### frameDiffTempDir
+* directory to save difference images of compared images
 #### imgCropper
 * configuration for cropping and image normalization process; used to crop, resize, normalize
 image for further number ocr process
@@ -202,6 +204,13 @@ Configures Tesseract OCR Engine
 #### imgDiff
 ##### originalImageDir
 * Sets the directory with images to diff with
+##### options
+###### file
+* Sets the output directory path for difference image of two compared images
+###### highlightStyle
+* Sets the highlight style of different segments on difference image http://www.graphicsmagick.org/GraphicsMagick.html#details-highlight-style
+###### tolerance
+* Sets the tolerance threshold (the default is 0.4)
 
 ## Interpreting diff results
 The main metric for diff images functionality is equality. Zero value means total equality. While values likes 0.1 or 0.5
@@ -225,7 +234,7 @@ can be interpreted as less equality between two images (0.1 being more equal tha
 
 ## General Notes
 * If your goal is testing some web service with video processing, the best practice 
-would be to prepare video file (to use it as a stream later) with known expected 
+would be to prepare a video file (to use it as a stream later) with known expected 
 test values. In my case image preparation included the following: i labeled each frame 
 with a white rectangle, containing number of frame and then extracted frames with ffmpeg
 * Frame labelling using ffmpeg for 1920x1080 video
@@ -244,8 +253,8 @@ ffmpeg -i your_file.mp4 -start_number 0 -vf fps=25 -hide_banner -qscale 1 ./your
 to diff extracted frames to previously prepared ones
 * In order to be able to use diff image feature you would also need to set directory with
 prepared images in the config and label each image with a corresponding number in the file name
- e.g. "thumb_0.png", "thumb0.png", "0.png". Diff feature expects that file name corresponds
- the number label on the image itself; note that png image format may not be suitable for image extraction due to compression
+ e.g. "thumb_0.jpg", "thumb0.jpg", "0.jpg". Diff feature expects that file name corresponds
+ the number label on the image itself
 * In terms of interpretation of VMAF Motion Average score I would recommend reading related 
 articles in the Additional Information
 * Entropy metric is quite reliable in detecting how much information is on the video, but 

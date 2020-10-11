@@ -75,7 +75,7 @@ module.exports.classify = async function(image, config) {
         image
           .split('thumb')
           .pop()
-          .replace(/\.jpg/gm, ''),
+          .replace(/\.jpg|\.png/gm, ''),
       ),
       classifiedObjects: predictions,
     };

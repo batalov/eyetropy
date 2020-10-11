@@ -9,6 +9,7 @@ module.exports.cfg = {
   splitImages: {
     imageExtension: 'png',
   },
+  frameDiffTempDir: path.join(os.tmpdir(), '/frame_diff_storage'),
   frameExtractionTempDir: path.join(os.tmpdir(), '/frame_extraction_storage'),
   recordVideoTempDir: path.join(os.tmpdir(), '/record_video_storage'),
   imgNumberOcrTempDir: path.join(os.tmpdir(), '/ocr_storage'),

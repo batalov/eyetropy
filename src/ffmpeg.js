@@ -4,13 +4,15 @@ const { exec } = require('child_process');
 const execute = promisify(exec);
 const log = require('loglevel');
 const { cfg } = require('../config/config');
+
 const path = require('path');
+
+const ffprobe = promisify(ffmpeg.ffprobe);
 
 module.exports.getMetaData = async input => {
   const metaDataLogLabel = cfg.logLabel.metaData;
   try {
     log.info(`${metaDataLogLabel}: start collecting meta data`);
-    const ffprobe = promisify(ffmpeg.ffprobe);
     const output = await ffprobe(input);
     log.info(`${metaDataLogLabel}: finish collecting meta data \n`);
     log.debug(`${metaDataLogLabel}: output \n ${JSON.stringify(output)}`);
@@ -382,6 +384,17 @@ module.exports.recordVideo = async (input, config) => {
     return { source: input, savedVideo: output };
   } catch (e) {
     e.message = `${recordVideoLabel}: error recording video \n${e.message}`;
+    throw e;
+  }
+};
+
+module.exports.validateInputVideoSource = async input => {
+  try {
+    log.info(`Start getting video source ${input}`);
+    await ffprobe(input);
+    log.info(`Finish validating video source ${input}`);
+  } catch (e) {
+    e.message = `Probably incorrect video source \n${e.message}`;
     throw e;
   }
 };

@@ -27,6 +27,7 @@ const {
   detectSilence,
   measureEntropy,
   recordVideo,
+  validateInputVideoSource,
 } = require('./src/ffmpeg');
 
 const { cropAndNormalizeImage } = require('./src/cropper');
@@ -35,9 +36,43 @@ const { imgNumberOcr } = require('./src/imgNumberOCR');
 const eyetropy = async function(input, options, config, logLevel) {
   try {
     setLogLevel(logLevel);
+
+    if (options == null || (options.constructor === Object && Object.entries(options).length === 0)) {
+      throw Error(
+        'Provide options object with at least one of these properties: \n' +
+          'metaData\n' +
+          'vmafMotionAvg\n' +
+          'extractFrames\n' +
+          'detectBlackness\n' +
+          'detectFreezes\n' +
+          'detectSilentParts\n' +
+          'measureBitplaneNoise\n' +
+          'measureEntropy\n' +
+          'recordVideo',
+      );
+    }
+
+    await validateInputVideoSource(input);
+
     await validateOptions(options);
     await validateConfig(config);
     const conf = prepareConfig(config);
+
+    if (options.recordVideo && !fs.existsSync(conf.recordVideoTempDir)) {
+      makeDir(conf.recordVideoTempDir);
+    }
+
+    if (options.extractFrames && options.extractFrames.diffImg) {
+      if (!conf.imgDiff.originalImageDir) {
+        throw Error('Missing config.imgDiff.originalImageDir param');
+      }
+      if (!fs.existsSync(conf.imgDiff.originalImageDir)) {
+        throw Error('Provided config.imgDiff.originalImageDir path does not exist');
+      }
+      if (fs.readdirSync(conf.imgDiff.originalImageDir).length === 0) {
+        throw Error('Provided config.imgDiff.originalImageDir is empty');
+      }
+    }
 
     const results = await launch(input, options, conf);
 
@@ -49,21 +84,6 @@ const eyetropy = async function(input, options, config, logLevel) {
 };
 
 async function launch(input, options, config) {
-  // if options empty or not passed return metadata
-  if (options == null || (options.constructor === Object && Object.entries(options).length === 0)) {
-    return { metaData: await getMetaData(input) };
-  }
-
-  if (config.imgDiff) {
-    if (!config.imgDiff.originalImageDir) {
-      throw Error('Missing config.imgDiff.originalImageDir param');
-    }
-    const imgDiffOriginalImageDirExists = fs.existsSync(config.imgDiff.originalImageDir);
-    if (!imgDiffOriginalImageDirExists) {
-      throw Error('Provided config.imgDiff.originalImageDir path does not exist');
-    }
-  }
-
   const methods = Array(8).fill('init');
   const propertyNameDict = {
     0: 'metaData',
@@ -153,19 +173,35 @@ async function labelImg(input, config) {
 async function handleFrameExtraction(input, options, config) {
   if (fs.existsSync(config.frameExtractionTempDir) && fs.readdirSync(config.frameExtractionTempDir).length !== 0) {
     await cleanUpDir(config.frameExtractionTempDir);
-  } else {
+  }
+
+  if (!fs.existsSync(config.frameExtractionTempDir)) {
     await makeDir(config.frameExtractionTempDir);
   }
 
-  await splitVideoIntoImages(input, config);
-
-  if (fs.existsSync(config.imgNumberOcrTempDir)) {
+  if (fs.existsSync(config.imgNumberOcrTempDir && fs.readdirSync(config.imgNumberOcrTempDir).length !== 0)) {
     await cleanUpDir(config.imgNumberOcrTempDir);
   }
 
-  if ((options.extractFrames.classifyObjects || options.extractFrames.diffImg) && config.imgCropper) {
+  if (
+    (options.extractFrames.classifyObjects || options.extractFrames.diffImg) &&
+    config.imgCropper &&
+    !fs.existsSync(config.imgNumberOcrTempDir)
+  ) {
     await makeDir(config.imgNumberOcrTempDir);
   }
+
+  if (config.imgDiff.options && config.imgDiff.options.file) {
+    if (fs.existsSync(config.imgDiff.options.file) && fs.readdirSync(config.imgDiff.options.file).length !== 0) {
+      await cleanUpDir(config.frameDiffTempDir);
+    }
+
+    if (!fs.existsSync(config.imgDiff.options.file)) {
+      await makeDir(config.frameDiffTempDir);
+    }
+  }
+
+  await splitVideoIntoImages(input, config);
 
   if (options.extractFrames.classifyObjects) {
     tf = require('./src/tensorFlow');
@@ -208,7 +244,11 @@ async function handleFrameExtraction(input, options, config) {
           if (originalImage === null) {
             frameOperations[2] = null;
           } else {
-            frameOperations[2] = diffImg(originalImage, imgPath);
+            if (config.imgDiff.options) {
+              frameOperations[2] = diffImg(originalImage, imgPath, config.imgDiff.options);
+            } else {
+              frameOperations[2] = diffImg(originalImage, imgPath);
+            }
           }
         }
       }

@@ -26,6 +26,7 @@ async function validateConfig(config) {
         .min(1)
         .max(31),
     }),
+    frameDiffTempDir: joi.string(),
     frameExtractionTempDir: joi.string(),
     imgNumberOcrTempDir: joi.string(),
     recordVideoTempDir: joi.string(),
@@ -61,6 +62,12 @@ async function validateConfig(config) {
     }),
     imgDiff: joi.object().keys({
       originalImageDir: joi.string().required(),
+      options: {
+        file: joi.string(),
+        highlightColor: joi.string().regex(/^yellow|red|purple$/),
+        tolerance: joi.number(),
+        highlightStyle: joi.string().regex(/^Assign|Threshold|Tint|XOR$/),
+      },
     }),
   });
 
