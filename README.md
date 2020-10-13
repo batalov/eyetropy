@@ -255,6 +255,8 @@ to diff extracted frames to previously prepared ones
 prepared images in the config and label each image with a corresponding number in the file name
  e.g. "thumb_0.jpg", "thumb0.jpg", "0.jpg". Diff feature expects that file name corresponds
  the number label on the image itself
+* When drawing rectangle with frame number it is important to fine tune the font size and boldness, mainly because 
+OCR engine is quite sensible to text size and it's weight
 * In terms of interpretation of VMAF Motion Average score I would recommend reading related 
 articles in the Additional Information
 * Entropy metric is quite reliable in detecting how much information is on the video, but 
